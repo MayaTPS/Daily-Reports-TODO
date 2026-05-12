@@ -5,57 +5,772 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TPS Operations To-Do List</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; min-height: 100vh; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .header { text-align: center; color: white; margin-bottom: 30px; }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-        .header p { font-size: 1.1em; opacity: 0.95; }
-        .payment-section { background: white; border-radius: 12px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; }
-        .payment-section h2 { color: #333; margin-bottom: 20px; font-size: 1.8em; }
-        .payment-button { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px 50px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.1em; }
-        .meeting-section { background: white; border-radius: 12px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-left: 5px solid #ffd700; }
-        .meeting-section h2 { color: #333; margin-bottom: 15px; font-size: 1.5em; }
-        .meeting-time { font-size: 1.3em; color: #667eea; font-weight: 600; margin-bottom: 10px; }
-        .meeting-details { color: #666; line-height: 1.6; }
-        .tasks-section { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .tasks-section h2 { color: #333; margin-bottom: 25px; font-size: 1.8em; border-bottom: 3px solid #667eea; padding-bottom: 15px; }
-        .task-item { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin-bottom: 18px; border-radius: 8px; }
-        .task-item:hover { background: #f0f2f7; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .task-property { font-weight: 700; color: #333; font-size: 1.1em; margin-bottom: 8px; }
-        .task-issue { color: #555; margin-bottom: 10px; font-size: 0.95em; }
-        .task-issue-label { font-weight: 600; color: #667eea; display: inline-block; margin-right: 5px; }
-        .task-action { background: white; padding: 12px; border-radius: 6px; color: #333; font-size: 0.95em; margin-top: 12px; }
-        .task-action-label { font-weight: 600; color: #764ba2; display: inline-block; margin-right: 5px; }
-        .footer { text-align: center; color: white; margin-top: 30px; font-size: 0.9em; opacity: 0.8; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --tps-gold: #D4AF95;
+            --tps-dark: #3d3d3d;
+            --tps-light: #f5f2ed;
+            --accent: #764ba2;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--tps-light) 0%, #ffffff 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--tps-gold);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(212, 175, 149, 0.1), rgba(212, 175, 149, 0.05));
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 2px solid var(--tps-gold);
+            box-shadow: 0 4px 15px rgba(212, 175, 149, 0.15);
+        }
+
+        .logo-img {
+            height: 60px;
+            width: auto;
+            display: block;
+        }
+
+        .header-text {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .brand {
+            font-size: 0.9em;
+            color: var(--tps-dark);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .tagline {
+            font-size: 0.85em;
+            color: var(--tps-gold);
+            font-weight: 500;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            color: var(--tps-dark);
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 1em;
+            color: #666;
+        }
+
+        /* Expenses Upload Section */
+        .expenses-section {
+            background: linear-gradient(135deg, #e8f4f8 0%, #f0f8fb 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.1);
+            border-left: 5px solid var(--accent);
+        }
+
+        .expenses-section h3 {
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .expenses-section p {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .upload-button {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+            background: #5a3680;
+        }
+
+        /* Payment Section - Enhanced */
+        .payment-section {
+            background: linear-gradient(135deg, var(--tps-gold) 0%, #c9a97a 100%);
+            border-radius: 12px;
+            padding: 40px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 35px rgba(212, 175, 149, 0.25);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .payment-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .payment-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95em;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .payment-section h2 {
+            color: white;
+            margin-bottom: 25px;
+            font-size: 2em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .payment-button {
+            display: inline-block;
+            background: white;
+            color: var(--tps-gold);
+            padding: 16px 48px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.05em;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            border: 3px solid white;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+
+        .payment-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            color: white;
+            background: transparent;
+        }
+
+        .meeting-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 6px solid var(--tps-gold);
+        }
+
+        .meeting-section h2 {
+            color: var(--tps-dark);
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .meeting-time {
+            font-size: 1.4em;
+            color: var(--tps-gold);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .meeting-details {
+            color: #555;
+            line-height: 1.8;
+            background: var(--tps-light);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .tasks-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .tasks-section h2 {
+            color: var(--tps-dark);
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            border-bottom: 3px solid var(--tps-gold);
+            padding-bottom: 15px;
+        }
+
+        .task-item {
+            background: var(--tps-light);
+            border-left: 5px solid var(--tps-gold);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .task-item:hover {
+            box-shadow: 0 4px 15px rgba(212, 175, 149, 0.15);
+            transform: translateX(5px);
+        }
+
+        .task-item.needs-input {
+            border-left-color: var(--accent);
+            background: linear-gradient(to right, rgba(118, 75, 162, 0.05), var(--tps-light));
+        }
+
+        .task-property {
+            font-weight: 700;
+            color: var(--tps-dark);
+            font-size: 1.15em;
+            margin-bottom: 8px;
+        }
+
+        .task-issue {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .task-issue-label {
+            font-weight: 600;
+            color: var(--tps-gold);
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .task-action {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            color: var(--tps-dark);
+            font-size: 0.95em;
+            margin-top: 12px;
+            border-left: 3px solid var(--tps-gold);
+        }
+
+        .task-action-label {
+            font-weight: 600;
+            color: var(--accent);
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        /* Response Section Styles */
+        .response-section {
+            background: rgba(118, 75, 162, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid rgba(212, 175, 149, 0.3);
+        }
+
+        .response-label {
+            font-weight: 600;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 12px;
+            font-size: 0.9em;
+        }
+
+        .response-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .response-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--tps-gold);
+            background: white;
+            color: var(--tps-dark);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .response-btn:hover {
+            background: var(--tps-gold);
+            color: white;
+        }
+
+        .response-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .response-note {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .response-note textarea {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--tps-gold);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9em;
+            resize: vertical;
+            min-height: 50px;
+            color: var(--tps-dark);
+        }
+
+        .response-note textarea::placeholder {
+            color: #999;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid var(--tps-gold);
+            text-align: center;
+        }
+
+        .footer-text {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            background: var(--tps-gold);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(212, 175, 149, 0.3);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(212, 175, 149, 0.4);
+            background: #c9a97a;
+        }
+
+        .action-button.secondary {
+            background: var(--accent);
+            box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+        }
+
+        .action-button.secondary:hover {
+            background: #5a3680;
+            box-shadow: 0 6px 16px rgba(118, 75, 162, 0.4);
+        }
+
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(to right, var(--tps-gold), transparent);
+            margin: 25px 0;
+        }
+
+        @media (max-width: 600px) {
+            .logo-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .logo-container {
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .payment-section {
+                padding: 30px 20px;
+            }
+
+            .payment-section h2 {
+                font-size: 1.6em;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header"><h1>TPS Operations</h1><p>Today's To-Do List</p></div>
-        <div class="payment-section"><h2>Payment</h2><a href="https://wise.com/pay/r/U36Y7yWMiwln8YY" class="payment-button">Process Payment</a></div>
-        <div class="meeting-section"><h2>Meeting with Tricia</h2><div class="meeting-time">9:30 AM Today</div><div class="meeting-details"><strong>Purpose:</strong> Go through reconciliation of TenantCloud and utilities<br><strong>Who:</strong> You &amp; Tricia<br>Can you make it?</div></div>
-        <div class="tasks-section"><h2>Open Items &amp; Action Items</h2>
-            <div class="task-item"><div class="task-property">Myrtle Ave, Unit 101</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Bedroom windows screens request</div><div class="task-action"><span class="task-action-label">Action:</span> Decide: Should we proceed (Y/N)? Determine who to send.</div></div>
-            <div class="task-item"><div class="task-property">General</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Wave Account - Vendor Invoicing</div><div class="task-action"><span class="task-action-label">Action:</span> Set this up ASAP</div></div>
-            <div class="task-item"><div class="task-property">25R Burwell Ave, Stoney Creek</div><div class="task-issue"><span class="task-issue-label">Issue:</span> New Property</div><div class="task-action"><span class="task-action-label">Action:</span> New client emailed; Maya responded and cc'd Tricia. Next steps pending.</div></div>
-            <div class="task-item"><div class="task-property">General</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Scotia Bank</div><div class="task-action"><span class="task-action-label">Action:</span> Notifications not helpful. Explore account access options and report back.</div></div>
-            <div class="task-item"><div class="task-property">General</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Utilities</div><div class="task-action"><span class="task-action-label">Action:</span> Utility sheet now updated. Meet with Maya to review so she can invoice tenants.</div></div>
-            <div class="task-item"><div class="task-property">General</div><div class="task-issue"><span class="task-issue-label">Issue:</span> TenantCloud Account Cleanup</div><div class="task-action"><span class="task-action-label">Action:</span> Clean up overdue accounts and utility billings in TenantCloud.</div></div>
-            <div class="task-item"><div class="task-property">Mohawk</div><div class="task-issue"><span class="task-issue-label">Issue:</span> City of Hamilton - Notice of Violation (Discarded items - Mirror)</div><div class="task-action"><span class="task-action-label">Action:</span> Follow up on city violation notice. Determine remedy and next steps.</div></div>
-            <div class="task-item"><div class="task-property">4-130 Wellington St</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Madison Greaves - Rent Discount Request</div><div class="task-action"><span class="task-action-label">Action:</span> Create CMA and send to landlord for review.</div></div>
-            <div class="task-item"><div class="task-property">West 4th, Unit 1</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Process Mike Herron invoice - $60.71 microwave</div><div class="task-action"><span class="task-action-label">Action:</span> Invoice received via TenantCloud. Review and process payment.</div></div>
-            <div class="task-item"><div class="task-property">Mohawk, Unit 2</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron Invoice - $465.30</div><div class="task-action"><span class="task-action-label">Action:</span> Mike messaged directly about this invoice. Review and process payment.</div></div>
-            <div class="task-item"><div class="task-property">Thayer, Unit 2</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Electrician needed - outlet issue</div><div class="task-action"><span class="task-action-label">Action:</span> Mike Herron confirmed electrical outlet issue (not ceiling fan). Contact electrician to schedule repair.</div></div>
-            <div class="task-item"><div class="task-property">Upper Wellington, Unit 2</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Vent blocking decision needed - Johnny Martinez</div><div class="task-action"><span class="task-action-label">Action:</span> Tenant unsure if he can block vents. Make decision and communicate to tenant.</div></div>
-            <div class="task-item"><div class="task-property">San Fernando</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron Invoice - $1,651.11</div><div class="task-action"><span class="task-action-label">Action:</span> Mike messaged directly about this invoice. Review and process payment.</div></div>
-            <div class="task-item"><div class="task-property">Upper Wellington, Unit ???</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Smoking Issue</div><div class="task-action"><span class="task-action-label">Action:</span> Email sent to tenant. If repeated, escalate and send formal LTB notice.</div></div>
-            <div class="task-item"><div class="task-property">Ferndale, Unit 2</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Lawn care complaint - grass overdue for mowing</div><div class="task-action"><span class="task-action-label">Action:</span> Tenant Caitlyn Jones reports lawn not cut in over a week. Contact Omar (assigned vendor) to schedule immediately.</div></div>
-            <div class="task-item"><div class="task-property">General</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Process On Demand Handyman Invoice 111</div><div class="task-action"><span class="task-action-label">Action:</span> Invoice $932.25 due May 15. Forward from Tricia. Review and process payment.</div></div>
-            <div class="task-item"><div class="task-property">Grandfield, Unit 1</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Follow up wall leak - vendor not patching</div><div class="task-action"><span class="task-action-label">Action:</span> Tenant Khristian Xu reporting water marks. Vendor not patching properly. Escalate with vendor and require remediation.</div></div>
-            <div class="task-item"><div class="task-property">Thayer, Unit 1</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron invoice - $226.78</div><div class="task-action"><span class="task-action-label">Action:</span> Invoice via TenantCloud. Review and process payment.</div></div>
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo-container">
+                    <img src="https://drive.google.com/uc?id=1y7up9k2QH0q2wI5Cj_L1Orvfgm7Xy_RH" alt="TPS Logo" class="logo-img">
+                </div>
+                <div class="header-text">
+                    <div class="brand">🏠 TPS Property Management</div>
+                    <div class="tagline">"Raising the bar in industry standards"</div>
+                </div>
+            </div>
+            <h1>Today's To-Do List</h1>
+            <p>Review items and provide feedback</p>
         </div>
-        <div class="footer"><p>TPS Property Management Operations List | Updated: Today</p></div>
+
+        <!-- Expenses Upload Section -->
+        <div class="expenses-section">
+            <h3>📁 Expenses & Invoices</h3>
+            <p>Have receipts or invoices? Upload them directly to our shared folder instead of sending via email or WhatsApp. Keep everything organized in one place.</p>
+            <a href="https://drive.google.com/drive/folders/1udSCvVZGOu7A1faxH65xQHF9kghy1_o4" target="_blank" class="upload-button">📤 Upload to Folder</a>
+        </div>
+
+        <!-- Payment Section - Enhanced -->
+        <div class="payment-section">
+            <div class="payment-content">
+                <span class="payment-label">💳 Payment Required</span>
+                <h2>Maya's April Invoice</h2>
+                <a href="https://wise.com/pay/r/U36Y7yWMiwln8YY" class="payment-button">💰 Click Here to Pay</a>
+            </div>
+        </div>
+
+        <!-- Meeting Section -->
+        <div class="meeting-section">
+            <h2>📅 Meeting with Tricia</h2>
+            <div class="meeting-time">9:30 AM Today</div>
+            <div class="meeting-details">
+                <strong>Purpose:</strong> Go through reconciliation of TenantCloud and utilities<br>
+                <strong>Who:</strong> You & Tricia<br>
+                <strong>What to bring:</strong> Latest utility sheet & TenantCloud account status
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Tasks Section -->
+        <div class="tasks-section">
+            <h2>✅ Items Needing Attention</h2>
+
+            <!-- ITEMS NEEDING TRICIA INPUT -->
+
+            <div class="task-item needs-input">
+                <div class="task-property">General</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Utilities</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Utility sheet now updated. Meet with Maya to review so she can invoice tenants.</div>
+
+                <div class="response-section">
+                    <span class="response-label">📋 Ready to review?</span>
+                    <div class="response-buttons">
+                        <button class="response-btn" onclick="setResponse(this, 'yes')">Yes</button>
+                        <button class="response-btn" onclick="setResponse(this, 'need-info')">Need Info</button>
+                        <button class="response-btn" onclick="setResponse(this, 'in-progress')">In Progress</button>
+                    </div>
+                    <div class="response-note">
+                        <textarea placeholder="Quick note..." onchange="updateNote(this)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="task-item needs-input">
+                <div class="task-property">Upper Wellington, Unit ???</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Smoking Issue</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Email sent to tenant. If repeated, escalate and send formal LTB notice.</div>
+
+                <div class="response-section">
+                    <span class="response-label">⚖️ Should we proceed with LTB notice if it repeats?</span>
+                    <div class="response-buttons">
+                        <button class="response-btn" onclick="setResponse(this, 'approved')">Approved</button>
+                        <button class="response-btn" onclick="setResponse(this, 'hold')">On Hold</button>
+                        <button class="response-btn" onclick="setResponse(this, 'discuss')">Discuss First</button>
+                    </div>
+                    <div class="response-note">
+                        <textarea placeholder="Quick note..." onchange="updateNote(this)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="task-item needs-input">
+                <div class="task-property">Grandfield, Unit 1</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Follow up wall leak - vendor not patching</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Tenant Khristian Xu reporting water marks. Vendor not patching properly. Escalate with vendor and require remediation.</div>
+
+                <div class="response-section">
+                    <span class="response-label">🔧 Approve escalation with vendor?</span>
+                    <div class="response-buttons">
+                        <button class="response-btn" onclick="setResponse(this, 'approved')">Approved</button>
+                        <button class="response-btn" onclick="setResponse(this, 'disapproved')">Disapproved</button>
+                        <button class="response-btn" onclick="setResponse(this, 'in-progress')">Already Started</button>
+                    </div>
+                    <div class="response-note">
+                        <textarea placeholder="Quick note..." onchange="updateNote(this)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="task-item needs-input">
+                <div class="task-property">Upper Wellington, Unit 2</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Vent blocking decision needed - Johnny Martinez</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Tenant unsure if he can block vents. Make decision and communicate to tenant.</div>
+
+                <div class="response-section">
+                    <span class="response-label">🚪 Can tenant block vents?</span>
+                    <div class="response-buttons">
+                        <button class="response-btn" onclick="setResponse(this, 'yes')">Yes</button>
+                        <button class="response-btn" onclick="setResponse(this, 'no')">No</button>
+                        <button class="response-btn" onclick="setResponse(this, 'conditions')">With Conditions</button>
+                    </div>
+                    <div class="response-note">
+                        <textarea placeholder="Quick note..." onchange="updateNote(this)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="task-item needs-input">
+                <div class="task-property">4-130 Wellington St</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Madison Greaves - Rent Discount Request</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Create CMA and send to landlord for review.</div>
+
+                <div class="response-section">
+                    <span class="response-label">💰 Ready to send CMA to landlord?</span>
+                    <div class="response-buttons">
+                        <button class="response-btn" onclick="setResponse(this, 'approved')">Approved</button>
+                        <button class="response-btn" onclick="setResponse(this, 'revise')">Need Revisions</button>
+                        <button class="response-btn" onclick="setResponse(this, 'waiting')">Still Waiting</button>
+                    </div>
+                    <div class="response-note">
+                        <textarea placeholder="Quick note..." onchange="updateNote(this)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OTHER ITEMS (NO RESPONSE) -->
+
+            <div class="task-item">
+                <div class="task-property">Myrtle Ave, Unit 101</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Bedroom windows screens request</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Decide: Should we proceed (Y/N)? Determine who to send.</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">General</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Wave Account - Vendor Invoicing</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Set this up ASAP</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">25R Burwell Ave, Stoney Creek</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> New Property</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> New client emailed; Maya responded and cc'd Tricia. Next steps pending.</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">General</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Scotia Bank</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Notifications not helpful. Explore account access options and report back.</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">General</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> TenantCloud Account Cleanup</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Clean up overdue accounts and utility billings in TenantCloud.</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">Mohawk</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> City of Hamilton - Notice of Violation (Discarded items - Mirror)</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Follow up on city violation notice. Determine remedy and next steps.</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">West 4th, Unit 1</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Process Mike Herron invoice - $60.71 microwave</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Invoice received via TenantCloud. Review and process payment.</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">Mohawk, Unit 2</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron Invoice - $465.30</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Mike messaged directly about this invoice. Review and process payment.</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">Thayer, Unit 2</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Electrician needed - outlet issue</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Mike Herron confirmed electrical outlet issue (not ceiling fan). Contact electrician to schedule repair.</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">San Fernando</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron Invoice - $1,651.11</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Mike messaged directly about this invoice. Review and process payment.</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">Ferndale, Unit 2</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Lawn care complaint - grass overdue for mowing</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Tenant Caitlyn Jones reports lawn not cut in over a week. Contact Omar (assigned vendor) to schedule immediately.</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">General</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Process On Demand Handyman Invoice 111</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Invoice $932.25 due May 15. Forward from Tricia. Review and process payment.</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-property">Thayer, Unit 1</div>
+                <div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron invoice - $226.78</div>
+                <div class="task-action"><span class="task-action-label">Action:</span> Invoice via TenantCloud. Review and process payment.</div>
+            </div>
+
+        </div>
+
+        <!-- Footer with Action Buttons -->
+        <div class="footer">
+            <div class="footer-text">
+                💡 <strong>Tip:</strong> Click buttons to provide feedback. Once you're done, copy your responses and paste in Slack #tps-daily-updates.
+            </div>
+            <div class="footer-buttons">
+                <button class="action-button" onclick="copyToClipboard()">📋 Copy Responses</button>
+                <button class="action-button secondary" onclick="clearAll()">🗑️ Clear All</button>
+            </div>
+        </div>
     </div>
+
+    <script>
+        // Store responses in memory (session only)
+        const responses = {};
+
+        function setResponse(btn, value) {
+            // Find the parent response section
+            const section = btn.closest('.response-section');
+            const item = section.closest('.task-item');
+            const property = item.querySelector('.task-property').textContent;
+
+            // Toggle active state
+            const siblings = btn.parentNode.querySelectorAll('.response-btn');
+            siblings.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Store response
+            if (!responses[property]) {
+                responses[property] = {};
+            }
+            responses[property].status = value;
+            responses[property].button = btn.textContent;
+        }
+
+        function updateNote(textarea) {
+            const section = textarea.closest('.response-section');
+            const item = section.closest('.task-item');
+            const property = item.querySelector('.task-property').textContent;
+
+            if (!responses[property]) {
+                responses[property] = {};
+            }
+            responses[property].note = textarea.value;
+        }
+
+        function copyToClipboard() {
+            // Build formatted response string
+            let output = `📌 *TPS Operations Feedback* - ${new Date().toLocaleDateString()}\n\n`;
+
+            if (Object.keys(responses).length === 0) {
+                output += `No responses provided yet.`;
+            } else {
+                for (const [property, data] of Object.entries(responses)) {
+                    if (data.status) {
+                        output += `✓ *${property}*\n`;
+                        output += `   Status: ${data.button}\n`;
+                        if (data.note) {
+                            output += `   Note: ${data.note}\n`;
+                        }
+                        output += `\n`;
+                    }
+                }
+            }
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(output).then(() => {
+                alert('✓ Responses copied! Paste in Slack #tps-daily-updates');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = output;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✓ Responses copied! Paste in Slack #tps-daily-updates');
+            });
+        }
+
+        function clearAll() {
+            if (confirm('Clear all responses?')) {
+                Object.keys(responses).forEach(key => delete responses[key]);
+                document.querySelectorAll('.response-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('textarea').forEach(ta => ta.value = '');
+                alert('All responses cleared.');
+            }
+        }
+    </script>
 </body>
 </html>
