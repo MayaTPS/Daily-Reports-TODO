@@ -729,7 +729,7 @@
                 <div class="card-title">Last 7 Days</div>
                 <ul class="wins-list">
 <!-- ARCHIVE-START -->
-<!-- updated: May 12, 2026 at 08:57 PM UTC -->
+<!-- updated: May 12, 2026 at 09:22 PM UTC -->
             <li>Sarim Chet - Rent receipts request Dec 2025-Apr 2026 | Done</li>
             <li>Cleaning Extraordinaire - Camera dispute and escalation concern | Done</li>
             <li>Mohawk - Mike Herron - Pending work at Mohawk follow-up | Done</li>
@@ -773,7 +773,7 @@
             </div>
             <div class="tasks-list">
 <!-- OPS-LOG-START -->
-<!-- updated: May 12, 2026 at 08:57 PM UTC -->
+<!-- updated: May 12, 2026 at 09:22 PM UTC -->
 
         <div class="task-card open">
             <div class="task-header">
@@ -818,13 +818,6 @@
             </div>
             <div class="task-issue">Wave Account - Vendor Invoicing | We need to set this up ASAP!</div>
         </div>
-        <div class="task-card done">
-            <div class="task-header">
-                <div class="task-property">25R Burwell Ave Stoney Creek</div>
-                <div class="task-meta"><span class="assignee-tag">Tricia</span> <span class="status-label">Done</span></div>
-            </div>
-            <div class="task-issue">New Property | New client emailed me, I responded and cc'd you</div>
-        </div>
         <div class="task-card open">
             <div class="task-header">
                 <div class="task-property">General</div>
@@ -845,13 +838,6 @@
                 <div class="task-meta"><span class="assignee-tag">Maya</span> <span class="status-label">In Progress</span></div>
             </div>
             <div class="task-issue">TenantCloud Account Cleanup | Clean Up tenantcloud overdue accounts and utility billings.</div>
-        </div>
-        <div class="task-card done">
-            <div class="task-header">
-                <div class="task-property">Mohawk</div>
-                <div class="task-meta"><span class="assignee-tag">Tricia</span> <span class="status-label">Done</span></div>
-            </div>
-            <div class="task-issue">City of Hamilton has issued a Notice of Violation | Discarded items - Mirror</div>
         </div>
         <div class="task-card needs-approval">
             <div class="task-header">
@@ -926,12 +912,20 @@
             </div>
             <div class="task-issue">Email not sent about the Smoking Issue | Initial email draft got cut. Need a full copy to send to the tenant. If behavior repeats, prepare an N5 notice.</div>
         </div>
-        <div class="task-card open">
+        <div class="task-card needs-approval">
             <div class="task-header">
                 <div class="task-property">Ferndale, Unit 2</div>
-                <div class="task-meta"><span class="assignee-tag">Tricia</span> <span class="status-label">Open</span></div>
+                <div class="task-meta"><span class="assignee-tag">Tricia</span> <span class="status-label">Needs Approval</span></div>
             </div>
             <div class="task-issue">Lawn care complaint - grass overdue for mowing | Tenant Caitlyn Jones (and roommate Austin) report lawn has not been cut in over a week. Omar is the assigned lawn care vendor per vendor matrix.</div>
+            <div class="task-controls">
+                <div class="btn-group">
+                    <button class="btn-control" onclick="setResponse(this,'approved')">Approved</button>
+                    <button class="btn-control" onclick="setResponse(this,'disapproved')">Disapproved</button>
+                    <button class="btn-control" onclick="setResponse(this,'hold')">On Hold</button>
+                </div>
+                <div class="task-note"><input type="text" placeholder="Add approval note..." onchange="updateNote(this)"></div>
+            </div>
         </div>
         <div class="task-card open">
             <div class="task-header">
