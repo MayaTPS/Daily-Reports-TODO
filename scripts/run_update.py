@@ -94,11 +94,11 @@ def li(it):
 def ensure_markers(h):
     if "<!-- ARCHIVE-START -->" not in h:
         h=re.sub(r'(<ul class="wins-list">)(.*?)(</ul>)',
-                 r'\g<1>\n<!-- ARCHIVE-START -->\g<2><!-- ARCHIVE-END -->\n        \g<3>',
+                 r'\g<1>\n<!-- ARCHIVE-START -->\n<!-- ARCHIVE-END -->\n        \g<3>',
                  h,flags=re.DOTALL)
     if "<!-- OPS-LOG-START -->" not in h:
         h=re.sub(r'(<div class="tasks-list">)(.*?)(</div>)',
-                 r'\g<1>\n<!-- OPS-LOG-START -->\g<2><!-- OPS-LOG-END -->\n        \g<3>',
+                 r'\g<1>\n<!-- OPS-LOG-START -->\n<!-- OPS-LOG-END -->\n        \g<3>',
                  h,flags=re.DOTALL,count=1)
     return h
 
