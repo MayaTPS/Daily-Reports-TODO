@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TPS Operations To-Do List</title>
+    <title>TPS Operations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,737 +13,1122 @@
         }
 
         :root {
-            --tps-gold: #D4AF95;
-            --tps-dark: #3d3d3d;
-            --tps-light: #f5f2ed;
-            --accent: #764ba2;
+            --tps-gold: #B8860B;
+            --tps-gold-light: #D4AF37;
+            --tps-gray: #5a5a5a;
+            --tps-gray-light: #8a8a8a;
+            --tps-gray-lighter: #a8a8a8;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafaf8;
+            --border: #e5e5e5;
+        }
+
+        body.dark-mode {
+            --bg-primary: #0f0f0d;
+            --bg-secondary: #1a1a18;
+            --text-primary: #f0f0ed;
+            --text-secondary: #b8b8b3;
+            --text-muted: #808078;
+            --border: #2a2a28;
+        }
+
+        html, body {
+            height: 100%;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, var(--tps-light) 0%, #ffffff 100%);
-            padding: 20px;
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.5;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
+        /* TOP NAVBAR */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid var(--tps-gold);
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
-        .header-text {
-            flex: 1;
-            min-width: 200px;
+        .navbar-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--tps-gold);
+            clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 100% 100%, 0% 100%, 0% 50%);
+            border-radius: 2px;
         }
 
-        .brand {
+        .navbar-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .navbar-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-primary);
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
             font-size: 0.9em;
-            color: var(--tps-dark);
-            letter-spacing: 2px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .navbar-btn:hover {
+            border-color: var(--tps-gold);
+            color: var(--tps-gold);
+        }
+
+        .navbar-btn.primary {
+            background: var(--tps-gold);
+            color: white;
+            border-color: var(--tps-gold);
+        }
+
+        .navbar-btn.primary:hover {
+            background: var(--tps-gold-light);
+            border-color: var(--tps-gold-light);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border);
+            transition: 0.3s;
+            border-radius: 12px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--tps-gold);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 30px;
+        }
+
+        /* HEADER SECTION */
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2.6em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1em;
+            font-weight: 400;
+        }
+
+        /* QUICK CARDS ROW */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .quick-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .quick-card:hover {
+            border-color: var(--tps-gold);
+            box-shadow: 0 8px 24px rgba(184, 134, 11, 0.08);
+        }
+
+        .card-icon {
+            font-size: 2.4em;
+            margin-bottom: 12px;
+        }
+
+        .card-label {
+            font-size: 0.75em;
+            color: var(--tps-gold);
+            font-weight: 700;
+            letter-spacing: 1px;
             text-transform: uppercase;
             margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-size: 1.35em;
             font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
         }
 
-        .tagline {
-            font-size: 0.85em;
+        .card-content {
+            font-size: 0.95em;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .card-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 0.9em;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .card-input:focus {
+            outline: none;
+            border-color: var(--tps-gold);
+            background: var(--bg-primary);
+        }
+
+        .wins-list {
+            list-style: none;
+        }
+
+        .wins-list li {
+            padding: 8px 0;
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .wins-list li:before {
+            content: "✓";
             color: var(--tps-gold);
-            font-weight: 500;
-            margin-bottom: 15px;
-            font-style: italic;
+            font-weight: 700;
+            font-size: 1.2em;
+            flex-shrink: 0;
         }
 
-        .header h1 {
-            font-size: 2.2em;
-            color: var(--tps-dark);
+        /* UPLOAD SECTION */
+        .upload-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 40px 30px;
+            text-align: center;
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: var(--tps-gold);
+            box-shadow: 0 8px 24px rgba(184, 134, 11, 0.08);
+        }
+
+        .upload-icon {
+            font-size: 2.8em;
+            margin-bottom: 16px;
+        }
+
+        .upload-title {
+            font-size: 1.35em;
+            font-weight: 600;
+            color: var(--text-primary);
             margin-bottom: 8px;
         }
 
-        .header p {
-            font-size: 1em;
-            color: #666;
-        }
-
-        /* Expenses Upload Section */
-        .expenses-section {
-            background: linear-gradient(135deg, #e8f4f8 0%, #f0f8fb 100%);
-            border-radius: 12px;
-            padding: 25px;
+        .upload-text {
+            color: var(--text-secondary);
             margin-bottom: 20px;
-            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.1);
-            border-left: 5px solid var(--accent);
-        }
-
-        .expenses-section h3 {
-            color: var(--accent);
-            margin-bottom: 12px;
-            font-size: 1.2em;
-        }
-
-        .expenses-section p {
-            color: #555;
-            margin-bottom: 15px;
-            line-height: 1.6;
             font-size: 0.95em;
         }
 
-        .upload-button {
+        .upload-btn {
             display: inline-block;
-            background: var(--accent);
+            background: var(--tps-gold);
             color: white;
-            padding: 14px 32px;
-            border-radius: 8px;
+            padding: 12px 32px;
+            border-radius: 5px;
             text-decoration: none;
             font-weight: 600;
             font-size: 0.95em;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+            transition: all 0.3s ease;
             border: none;
             cursor: pointer;
         }
 
-        .upload-button:hover {
+        .upload-btn:hover {
+            background: var(--tps-gold-light);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
-            background: #5a3680;
+            box-shadow: 0 8px 16px rgba(184, 134, 11, 0.25);
         }
 
-        /* Payment Section - Enhanced */
-        .payment-section {
-            background: linear-gradient(135deg, var(--tps-gold) 0%, #c9a97a 100%);
-            border-radius: 12px;
-            padding: 40px 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 35px rgba(212, 175, 149, 0.25);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+        /* TASKS SECTION */
+        .tasks-header {
+            margin-bottom: 30px;
         }
 
-        .payment-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            z-index: 0;
-        }
-
-        .payment-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .payment-label {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.95em;
-            font-weight: 500;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            display: block;
-        }
-
-        .payment-section h2 {
-            color: white;
-            margin-bottom: 25px;
+        .tasks-title {
             font-size: 2em;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .payment-button {
-            display: inline-block;
-            background: white;
-            color: var(--tps-gold);
-            padding: 16px 48px;
-            border-radius: 8px;
-            text-decoration: none;
             font-weight: 700;
-            font-size: 1.05em;
-            transition: all 0.3s;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-            border: 3px solid white;
-            cursor: pointer;
-            letter-spacing: 0.5px;
+            color: var(--text-primary);
+            margin-bottom: 5px;
         }
 
-        .payment-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            color: white;
-            background: transparent;
+        .category-section {
+            margin-bottom: 40px;
         }
 
-        .meeting-section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border-left: 6px solid var(--tps-gold);
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
         }
 
-        .meeting-section h2 {
-            color: var(--tps-dark);
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-
-        .meeting-time {
-            font-size: 1.4em;
-            color: var(--tps-gold);
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-
-        .meeting-details {
-            color: #555;
-            line-height: 1.8;
-            background: var(--tps-light);
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .tasks-section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .tasks-section h2 {
-            color: var(--tps-dark);
-            margin-bottom: 25px;
+        .category-icon {
             font-size: 1.8em;
-            border-bottom: 3px solid var(--tps-gold);
-            padding-bottom: 15px;
         }
 
-        .task-item {
-            background: var(--tps-light);
-            border-left: 5px solid var(--tps-gold);
-            padding: 20px;
-            margin-bottom: 20px;
+        .category-name {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+        }
+
+        .tasks-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .task-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
             border-radius: 8px;
-            transition: all 0.3s;
+            padding: 20px;
+            transition: all 0.3s ease;
         }
 
-        .task-item:hover {
-            box-shadow: 0 4px 15px rgba(212, 175, 149, 0.15);
-            transform: translateX(5px);
+        .task-card:hover {
+            border-color: var(--tps-gold);
+            box-shadow: 0 6px 20px rgba(184, 134, 11, 0.08);
         }
 
-        .task-item.needs-input {
-            border-left-color: var(--accent);
-            background: linear-gradient(to right, rgba(118, 75, 162, 0.05), var(--tps-light));
+        .task-header {
+            margin-bottom: 12px;
         }
 
         .task-property {
-            font-weight: 700;
-            color: var(--tps-dark);
-            font-size: 1.15em;
-            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1em;
+            margin-bottom: 4px;
         }
 
         .task-issue {
-            color: #555;
-            margin-bottom: 10px;
-            font-size: 0.95em;
-        }
-
-        .task-issue-label {
-            font-weight: 600;
-            color: var(--tps-gold);
-            display: inline-block;
-            margin-right: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9em;
         }
 
         .task-action {
-            background: white;
+            background: var(--bg-secondary);
             padding: 12px;
-            border-radius: 6px;
-            color: var(--tps-dark);
-            font-size: 0.95em;
-            margin-top: 12px;
+            border-radius: 5px;
+            margin-bottom: 14px;
             border-left: 3px solid var(--tps-gold);
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            line-height: 1.6;
         }
 
         .task-action-label {
             font-weight: 600;
-            color: var(--accent);
-            display: inline-block;
-            margin-right: 5px;
+            color: var(--tps-gold);
         }
 
-        /* Response Section Styles */
-        .response-section {
-            background: rgba(118, 75, 162, 0.05);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border: 1px solid rgba(212, 175, 149, 0.3);
-        }
-
-        .response-label {
-            font-weight: 600;
-            color: var(--accent);
-            display: block;
-            margin-bottom: 12px;
-            font-size: 0.9em;
-        }
-
-        .response-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .response-btn {
-            padding: 8px 16px;
-            border: 2px solid var(--tps-gold);
-            background: white;
-            color: var(--tps-dark);
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85em;
-            transition: all 0.2s;
-            flex: 1;
-            min-width: 80px;
-        }
-
-        .response-btn:hover {
-            background: var(--tps-gold);
-            color: white;
-        }
-
-        .response-btn.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .response-note {
-            display: flex;
-            gap: 8px;
-            align-items: flex-start;
-        }
-
-        .response-note textarea {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid var(--tps-gold);
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 0.9em;
-            resize: vertical;
-            min-height: 50px;
-            color: var(--tps-dark);
-        }
-
-        .response-note textarea::placeholder {
-            color: #999;
-        }
-
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid var(--tps-gold);
-            text-align: center;
-        }
-
-        .footer-text {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 15px;
-        }
-
-        .footer-buttons {
+        .task-controls {
             display: flex;
             gap: 10px;
-            justify-content: center;
+            align-items: center;
             flex-wrap: wrap;
         }
 
-        .action-button {
+        .btn-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-control {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-primary);
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8em;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-control:hover {
+            border-color: var(--tps-gold);
+            color: var(--tps-gold);
+        }
+
+        .btn-control.active {
             background: var(--tps-gold);
             color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
+            border-color: var(--tps-gold);
+        }
+
+        .task-note {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .task-note input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 0.8em;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .task-note input:focus {
+            outline: none;
+            border-color: var(--tps-gold);
+        }
+
+        /* SUMMARY MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-primary);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            font-size: 1.8em;
+            color: var(--text-secondary);
             cursor: pointer;
+            transition: color 0.2s;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+
+        .modal-close:hover {
+            color: var(--tps-gold);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .summary-item {
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 5px;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--tps-gold);
+        }
+
+        .summary-item-title {
             font-weight: 600;
-            font-size: 0.95em;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(212, 175, 149, 0.3);
+            color: var(--text-primary);
+            margin-bottom: 4px;
         }
 
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(212, 175, 149, 0.4);
-            background: #c9a97a;
+        .summary-item-status {
+            font-size: 0.9em;
+            color: var(--tps-gold);
+            margin-bottom: 4px;
         }
 
-        .action-button.secondary {
-            background: var(--accent);
-            box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+        .summary-item-note {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            font-style: italic;
         }
 
-        .action-button.secondary:hover {
-            background: #5a3680;
-            box-shadow: 0 6px 16px rgba(118, 75, 162, 0.4);
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
         }
 
-        .section-divider {
-            height: 1px;
-            background: linear-gradient(to right, var(--tps-gold), transparent);
-            margin: 25px 0;
-        }
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.8em;
+            }
 
-        @media (max-width: 600px) {
-            .logo-section {
+            .navbar {
                 flex-direction: column;
                 gap: 15px;
             }
 
-            .logo-container {
+            .navbar-left {
                 width: 100%;
             }
 
-            .header h1 {
-                font-size: 1.8em;
+            .navbar-right {
+                width: 100%;
+                justify-content: space-between;
             }
 
-            .payment-section {
-                padding: 30px 20px;
+            .cards-grid {
+                grid-template-columns: 1fr;
             }
 
-            .payment-section h2 {
-                font-size: 1.6em;
+            .task-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-group {
+                width: 100%;
+            }
+
+            .btn-control {
+                flex: 1;
+            }
+
+            .task-note {
+                min-width: 100%;
             }
         }
     </style>
 </head>
 <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div class="navbar-logo"></div>
+            <div class="navbar-title">TPS Operations</div>
+        </div>
+        <div class="navbar-right">
+            <button class="navbar-btn primary" onclick="showSummary()">
+                📊 View Summary
+            </button>
+            <label class="navbar-btn" style="border: none; background: transparent; padding: 0; margin: 0; gap: 10px;">
+                <span>🌙</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                    <span class="slider"></span>
+                </label>
+            </label>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
     <div class="container">
-        <div class="header">
-            <div class="logo-section">
-                <div class="logo-container">
-                    <img src="https://drive.google.com/uc?id=1y7up9k2QH0q2wI5Cj_L1Orvfgm7Xy_RH" alt="TPS Logo" class="logo-img">
-                </div>
-                <div class="header-text">
-                    <div class="brand">🏠 TPS Property Management</div>
-                    <div class="tagline">"Raising the bar in industry standards"</div>
-                </div>
-            </div>
-            <h1>Today's To-Do List</h1>
-            <p>Review items and provide feedback</p>
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <h1 class="page-title">Today's Operations</h1>
+            <p class="page-subtitle">Review, decide, and move forward</p>
         </div>
 
-        <!-- Expenses Upload Section -->
-        <div class="expenses-section">
-            <h3>📁 Expenses & Invoices</h3>
-            <p>Have receipts or invoices? Upload them directly to our shared folder instead of sending via email or WhatsApp. Keep everything organized in one place.</p>
-            <a href="https://drive.google.com/drive/folders/1udSCvVZGOu7A1faxH65xQHF9kghy1_o4" target="_blank" class="upload-button">📤 Upload to Folder</a>
+        <!-- QUICK CARDS -->
+        <div class="cards-grid">
+            <!-- Meeting Card -->
+            <div class="quick-card">
+                <div class="card-icon">📅</div>
+                <div class="card-label">Meeting</div>
+                <div class="card-title">Tricia Check-in</div>
+                <div class="card-content">
+                    <strong>9:30 AM</strong> (or suggest below)<br>
+                    Daily operational sync
+                </div>
+                <input type="text" class="card-input" id="meetingTime" placeholder="Alternative time?">
+            </div>
+
+            <!-- Quick Wins Card -->
+            <div class="quick-card">
+                <div class="card-icon">🎯</div>
+                <div class="card-label">Completed</div>
+                <div class="card-title">Last 7 Days</div>
+                <ul class="wins-list">
+                    <li>Wall leak patch — Grandfield, Unit 1</li>
+                    <li>Smoking notice sent</li>
+                    <li>Invoices reviewed & sorted</li>
+                    <li>Lawn care scheduled</li>
+                </ul>
+            </div>
+
+            <!-- Payment Card -->
+            <div class="quick-card">
+                <div class="card-icon">💳</div>
+                <div class="card-label">Payment</div>
+                <div class="card-title">Maya's Invoice</div>
+                <div class="card-content">
+                    April invoice ready to process
+                </div>
+                <a href="https://wise.com/pay/r/U36Y7yWMiwln8YY" style="color: var(--tps-gold); text-decoration: none; font-weight: 600; display: inline-block; margin-top: 8px;">Pay Now →</a>
+            </div>
         </div>
 
-        <!-- Payment Section - Enhanced -->
-        <div class="payment-section">
-            <div class="payment-content">
-                <span class="payment-label">💳 Payment Required</span>
-                <h2>Maya's April Invoice</h2>
-                <a href="https://wise.com/pay/r/U36Y7yWMiwln8YY" class="payment-button">💰 Click Here to Pay</a>
+        <!-- UPLOAD SECTION -->
+        <div class="upload-section">
+            <div class="upload-icon">📁</div>
+            <div class="upload-title">Expenses & Invoices</div>
+            <div class="upload-text">Dump everything inside this folder</div>
+            <a href="https://drive.google.com/drive/folders/1udSCvVZGOu7A1faxH65xQHF9kghy1_o4" target="_blank" class="upload-btn">📤 Upload to Folder</a>
+        </div>
+
+        <!-- TASKS SECTION -->
+        <div class="tasks-header">
+            <h2 class="tasks-title">Items Needing Attention</h2>
+        </div>
+
+        <!-- PROPERTY MAINTENANCE -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🔧</span>
+                <span class="category-name">Property Maintenance</span>
+            </div>
+            <div class="tasks-list">
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Grandfield, Unit 1</div>
+                        <div class="task-issue">Wall leak — vendor not patching properly</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Tenant Khristian Xu reporting water marks. Escalate and require remediation.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Approved</button>
+                            <button class="btn-control" onclick="setResponse(this, 'disapproved')">Disapproved</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">On Hold</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Thayer, Unit 2</div>
+                        <div class="task-issue">Electrical outlet issue</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Mike Herron confirmed electrical issue. Contact electrician to schedule repair.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Approved</button>
+                            <button class="btn-control" onclick="setResponse(this, 'disapproved')">Disapproved</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">On Hold</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Myrtle Ave, Unit 101</div>
+                        <div class="task-issue">Bedroom window screens request</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Decide approval and determine who to send.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'yes')">Yes</button>
+                            <button class="btn-control" onclick="setResponse(this, 'no')">No</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Upper Wellington, Unit 2</div>
+                        <div class="task-issue">Can tenant block vents? — Johnny Martinez</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Make decision and communicate to tenant.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'yes')">Yes</button>
+                            <button class="btn-control" onclick="setResponse(this, 'no')">No</button>
+                            <button class="btn-control" onclick="setResponse(this, 'conditions')">Conditions</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Ferndale, Unit 2</div>
+                        <div class="task-issue">Lawn care — grass overdue for mowing</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Tenant Caitlyn Jones reports lawn not cut in over a week. Contact Omar immediately.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Approved</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">On Hold</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Mohawk</div>
+                        <div class="task-issue">City of Hamilton — Notice of Violation</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Follow up on violation notice. Determine remedy and next steps.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'resolved')">Resolved</button>
+                            <button class="btn-control" onclick="setResponse(this, 'in-progress')">In Progress</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Upper Wellington, Unit ???</div>
+                        <div class="task-issue">Smoking Issue</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Email sent. If repeated, escalate with formal LTB notice.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Proceed</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">Hold</button>
+                            <button class="btn-control" onclick="setResponse(this, 'discuss')">Discuss</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Meeting Section -->
-        <div class="meeting-section">
-            <h2>📅 Meeting with Tricia</h2>
-            <div class="meeting-time">9:30 AM Today</div>
-            <div class="meeting-details">
-                <strong>Purpose:</strong> Go through reconciliation of TenantCloud and utilities<br>
-                <strong>Who:</strong> You & Tricia<br>
-                <strong>What to bring:</strong> Latest utility sheet & TenantCloud account status
+        <!-- FINANCIAL -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">💰</span>
+                <span class="category-name">Financial</span>
+            </div>
+            <div class="tasks-list">
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">4-130 Wellington St</div>
+                        <div class="task-issue">Madison Greaves — Rent Discount Request</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Create CMA and send to landlord for review.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Ready</button>
+                            <button class="btn-control" onclick="setResponse(this, 'revise')">Revise</button>
+                            <button class="btn-control" onclick="setResponse(this, 'waiting')">Waiting</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">West 4th, Unit 1</div>
+                        <div class="task-issue">Invoice — Mike Herron $60.71</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Review and process payment.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Pay</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">Hold</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Mohawk, Unit 2</div>
+                        <div class="task-issue">Invoice — Mike Herron $465.30</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Review and process payment.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Pay</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">Hold</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">San Fernando</div>
+                        <div class="task-issue">Invoice — Mike Herron $1,651.11</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Review and process payment.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Pay</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">Hold</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Thayer, Unit 1</div>
+                        <div class="task-issue">Invoice — Mike Herron $226.78</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Review and process payment.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Pay</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">Hold</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">General</div>
+                        <div class="task-issue">On Demand Handyman Invoice 111 — $932.25</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Due May 15. Review and process payment.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Pay</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">Hold</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="section-divider"></div>
-
-        <!-- Tasks Section -->
-        <div class="tasks-section">
-            <h2>✅ Items Needing Attention</h2>
-
-            <!-- ITEMS NEEDING TRICIA INPUT -->
-
-            <div class="task-item needs-input">
-                <div class="task-property">General</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Utilities</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Utility sheet now updated. Meet with Maya to review so she can invoice tenants.</div>
-
-                <div class="response-section">
-                    <span class="response-label">📋 Ready to review?</span>
-                    <div class="response-buttons">
-                        <button class="response-btn" onclick="setResponse(this, 'yes')">Yes</button>
-                        <button class="response-btn" onclick="setResponse(this, 'need-info')">Need Info</button>
-                        <button class="response-btn" onclick="setResponse(this, 'in-progress')">In Progress</button>
+        <!-- GENERAL -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📋</span>
+                <span class="category-name">General</span>
+            </div>
+            <div class="tasks-list">
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Utilities</div>
+                        <div class="task-issue">Utility sheet now updated</div>
                     </div>
-                    <div class="response-note">
-                        <textarea placeholder="Quick note..." onchange="updateNote(this)"></textarea>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Review sheet. Ready to invoice tenants?</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'yes')">Yes</button>
+                            <button class="btn-control" onclick="setResponse(this, 'need-info')">Need Info</button>
+                            <button class="btn-control" onclick="setResponse(this, 'in-progress')">In Progress</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Wave Account</div>
+                        <div class="task-issue">Vendor Invoicing Setup</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Set this up ASAP.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Approved</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">Hold</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">25R Burwell Ave, Stoney Creek</div>
+                        <div class="task-issue">New Property</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> New client inquiry. Next steps pending.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'proceed')">Proceed</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">Hold</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">Scotia Bank</div>
+                        <div class="task-issue">Notifications not helpful</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Explore account access options and report.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'done')">Done</button>
+                            <button class="btn-control" onclick="setResponse(this, 'in-progress')">In Progress</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-property">TenantCloud</div>
+                        <div class="task-issue">Account Cleanup</div>
+                    </div>
+                    <div class="task-action"><span class="task-action-label">Action:</span> Clean up overdue accounts and utility billings.</div>
+                    <div class="task-controls">
+                        <div class="btn-group">
+                            <button class="btn-control" onclick="setResponse(this, 'approved')">Approved</button>
+                            <button class="btn-control" onclick="setResponse(this, 'hold')">Hold</button>
+                        </div>
+                        <div class="task-note">
+                            <input type="text" placeholder="Note..." onchange="updateNote(this)">
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="task-item needs-input">
-                <div class="task-property">Upper Wellington, Unit ???</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Smoking Issue</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Email sent to tenant. If repeated, escalate and send formal LTB notice.</div>
-
-                <div class="response-section">
-                    <span class="response-label">⚖️ Should we proceed with LTB notice if it repeats?</span>
-                    <div class="response-buttons">
-                        <button class="response-btn" onclick="setResponse(this, 'approved')">Approved</button>
-                        <button class="response-btn" onclick="setResponse(this, 'hold')">On Hold</button>
-                        <button class="response-btn" onclick="setResponse(this, 'discuss')">Discuss First</button>
-                    </div>
-                    <div class="response-note">
-                        <textarea placeholder="Quick note..." onchange="updateNote(this)"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="task-item needs-input">
-                <div class="task-property">Grandfield, Unit 1</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Follow up wall leak - vendor not patching</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Tenant Khristian Xu reporting water marks. Vendor not patching properly. Escalate with vendor and require remediation.</div>
-
-                <div class="response-section">
-                    <span class="response-label">🔧 Approve escalation with vendor?</span>
-                    <div class="response-buttons">
-                        <button class="response-btn" onclick="setResponse(this, 'approved')">Approved</button>
-                        <button class="response-btn" onclick="setResponse(this, 'disapproved')">Disapproved</button>
-                        <button class="response-btn" onclick="setResponse(this, 'in-progress')">Already Started</button>
-                    </div>
-                    <div class="response-note">
-                        <textarea placeholder="Quick note..." onchange="updateNote(this)"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="task-item needs-input">
-                <div class="task-property">Upper Wellington, Unit 2</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Vent blocking decision needed - Johnny Martinez</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Tenant unsure if he can block vents. Make decision and communicate to tenant.</div>
-
-                <div class="response-section">
-                    <span class="response-label">🚪 Can tenant block vents?</span>
-                    <div class="response-buttons">
-                        <button class="response-btn" onclick="setResponse(this, 'yes')">Yes</button>
-                        <button class="response-btn" onclick="setResponse(this, 'no')">No</button>
-                        <button class="response-btn" onclick="setResponse(this, 'conditions')">With Conditions</button>
-                    </div>
-                    <div class="response-note">
-                        <textarea placeholder="Quick note..." onchange="updateNote(this)"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="task-item needs-input">
-                <div class="task-property">4-130 Wellington St</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Madison Greaves - Rent Discount Request</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Create CMA and send to landlord for review.</div>
-
-                <div class="response-section">
-                    <span class="response-label">💰 Ready to send CMA to landlord?</span>
-                    <div class="response-buttons">
-                        <button class="response-btn" onclick="setResponse(this, 'approved')">Approved</button>
-                        <button class="response-btn" onclick="setResponse(this, 'revise')">Need Revisions</button>
-                        <button class="response-btn" onclick="setResponse(this, 'waiting')">Still Waiting</button>
-                    </div>
-                    <div class="response-note">
-                        <textarea placeholder="Quick note..." onchange="updateNote(this)"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- OTHER ITEMS (NO RESPONSE) -->
-
-            <div class="task-item">
-                <div class="task-property">Myrtle Ave, Unit 101</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Bedroom windows screens request</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Decide: Should we proceed (Y/N)? Determine who to send.</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">General</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Wave Account - Vendor Invoicing</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Set this up ASAP</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">25R Burwell Ave, Stoney Creek</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> New Property</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> New client emailed; Maya responded and cc'd Tricia. Next steps pending.</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">General</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Scotia Bank</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Notifications not helpful. Explore account access options and report back.</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">General</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> TenantCloud Account Cleanup</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Clean up overdue accounts and utility billings in TenantCloud.</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">Mohawk</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> City of Hamilton - Notice of Violation (Discarded items - Mirror)</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Follow up on city violation notice. Determine remedy and next steps.</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">West 4th, Unit 1</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Process Mike Herron invoice - $60.71 microwave</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Invoice received via TenantCloud. Review and process payment.</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">Mohawk, Unit 2</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron Invoice - $465.30</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Mike messaged directly about this invoice. Review and process payment.</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">Thayer, Unit 2</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Electrician needed - outlet issue</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Mike Herron confirmed electrical outlet issue (not ceiling fan). Contact electrician to schedule repair.</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">San Fernando</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron Invoice - $1,651.11</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Mike messaged directly about this invoice. Review and process payment.</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">Ferndale, Unit 2</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Lawn care complaint - grass overdue for mowing</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Tenant Caitlyn Jones reports lawn not cut in over a week. Contact Omar (assigned vendor) to schedule immediately.</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">General</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Process On Demand Handyman Invoice 111</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Invoice $932.25 due May 15. Forward from Tricia. Review and process payment.</div>
-            </div>
-
-            <div class="task-item">
-                <div class="task-property">Thayer, Unit 1</div>
-                <div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron invoice - $226.78</div>
-                <div class="task-action"><span class="task-action-label">Action:</span> Invoice via TenantCloud. Review and process payment.</div>
-            </div>
-
         </div>
+    </div>
 
-        <!-- Footer with Action Buttons -->
-        <div class="footer">
-            <div class="footer-text">
-                💡 <strong>Tip:</strong> Click buttons to provide feedback. Once you're done, copy your responses and paste in Slack #tps-daily-updates.
+    <!-- SUMMARY MODAL -->
+    <div class="modal-overlay" id="summaryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Summary</h2>
+                <button class="modal-close" onclick="closeSummary()">✕</button>
             </div>
-            <div class="footer-buttons">
-                <button class="action-button" onclick="copyToClipboard()">📋 Copy Responses</button>
-                <button class="action-button secondary" onclick="clearAll()">🗑️ Clear All</button>
+            <div class="modal-body" id="summaryBody">
+                <div class="empty-state">No responses yet</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Store responses in memory (session only)
         const responses = {};
 
         function setResponse(btn, value) {
-            // Find the parent response section
-            const section = btn.closest('.response-section');
-            const item = section.closest('.task-item');
-            const property = item.querySelector('.task-property').textContent;
+            const card = btn.closest('.task-card');
+            const property = card.querySelector('.task-property').textContent;
 
-            // Toggle active state
-            const siblings = btn.parentNode.querySelectorAll('.response-btn');
+            const siblings = btn.parentNode.querySelectorAll('.btn-control');
             siblings.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
-            // Store response
             if (!responses[property]) {
                 responses[property] = {};
             }
-            responses[property].status = value;
-            responses[property].button = btn.textContent;
+            responses[property].status = btn.textContent;
         }
 
-        function updateNote(textarea) {
-            const section = textarea.closest('.response-section');
-            const item = section.closest('.task-item');
-            const property = item.querySelector('.task-property').textContent;
+        function updateNote(input) {
+            const card = input.closest('.task-card');
+            const property = card.querySelector('.task-property').textContent;
 
             if (!responses[property]) {
                 responses[property] = {};
             }
-            responses[property].note = textarea.value;
+            responses[property].note = input.value;
         }
 
-        function copyToClipboard() {
-            // Build formatted response string
-            let output = `📌 *TPS Operations Feedback* - ${new Date().toLocaleDateString()}\n\n`;
+        function showSummary() {
+            const modal = document.getElementById('summaryModal');
+            const body = document.getElementById('summaryBody');
 
-            if (Object.keys(responses).length === 0) {
-                output += `No responses provided yet.`;
+            if (Object.keys(responses).length === 0 || !Object.values(responses).some(r => r.status)) {
+                body.innerHTML = '<div class="empty-state">No responses submitted yet</div>';
             } else {
+                let html = '';
                 for (const [property, data] of Object.entries(responses)) {
                     if (data.status) {
-                        output += `✓ *${property}*\n`;
-                        output += `   Status: ${data.button}\n`;
-                        if (data.note) {
-                            output += `   Note: ${data.note}\n`;
-                        }
-                        output += `\n`;
+                        html += `
+                            <div class="summary-item">
+                                <div class="summary-item-title">✓ ${property}</div>
+                                <div class="summary-item-status">Status: ${data.status}</div>
+                                ${data.note ? `<div class="summary-item-note">Note: ${data.note}</div>` : ''}
+                            </div>
+                        `;
                     }
                 }
+                body.innerHTML = html;
             }
 
-            // Copy to clipboard
-            navigator.clipboard.writeText(output).then(() => {
-                alert('✓ Responses copied! Paste in Slack #tps-daily-updates');
-            }).catch(() => {
-                // Fallback for older browsers
-                const textarea = document.createElement('textarea');
-                textarea.value = output;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                alert('✓ Responses copied! Paste in Slack #tps-daily-updates');
-            });
+            modal.classList.add('show');
         }
 
-        function clearAll() {
-            if (confirm('Clear all responses?')) {
-                Object.keys(responses).forEach(key => delete responses[key]);
-                document.querySelectorAll('.response-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('textarea').forEach(ta => ta.value = '');
-                alert('All responses cleared.');
+        function closeSummary() {
+            document.getElementById('summaryModal').classList.remove('show');
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeToggle').checked = true;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('summaryModal');
+            if (event.target === modal) {
+                modal.classList.remove('show');
             }
         }
     </script>
