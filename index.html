@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPS Operations To-Do List</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; color: white; margin-bottom: 30px; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .header p { font-size: 1.1em; opacity: 0.95; }
+        .payment-section { background: white; border-radius: 12px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; }
+        .payment-section h2 { color: #333; margin-bottom: 20px; font-size: 1.8em; }
+        .payment-button { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px 50px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+        .meeting-section { background: white; border-radius: 12px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-left: 5px solid #ffd700; }
+        .meeting-section h2 { color: #333; margin-bottom: 15px; font-size: 1.5em; }
+        .meeting-time { font-size: 1.3em; color: #667eea; font-weight: 600; margin-bottom: 10px; }
+        .meeting-details { color: #666; line-height: 1.6; }
+        .tasks-section { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .tasks-section h2 { color: #333; margin-bottom: 25px; font-size: 1.8em; border-bottom: 3px solid #667eea; padding-bottom: 15px; }
+        .task-item { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin-bottom: 18px; border-radius: 8px; }
+        .task-item:hover { background: #f0f2f7; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .task-property { font-weight: 700; color: #333; font-size: 1.1em; margin-bottom: 8px; }
+        .task-issue { color: #555; margin-bottom: 10px; font-size: 0.95em; }
+        .task-issue-label { font-weight: 600; color: #667eea; display: inline-block; margin-right: 5px; }
+        .task-action { background: white; padding: 12px; border-radius: 6px; color: #333; font-size: 0.95em; margin-top: 12px; }
+        .task-action-label { font-weight: 600; color: #764ba2; display: inline-block; margin-right: 5px; }
+        .footer { text-align: center; color: white; margin-top: 30px; font-size: 0.9em; opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header"><h1>TPS Operations</h1><p>Today's To-Do List</p></div>
+        <div class="payment-section"><h2>Payment</h2><a href="https://wise.com/pay/r/U36Y7yWMiwln8YY" class="payment-button">Process Payment</a></div>
+        <div class="meeting-section"><h2>Meeting with Tricia</h2><div class="meeting-time">9:30 AM Today</div><div class="meeting-details"><strong>Purpose:</strong> Go through reconciliation of TenantCloud and utilities<br><strong>Who:</strong> You &amp; Tricia<br>Can you make it?</div></div>
+        <div class="tasks-section"><h2>Open Items &amp; Action Items</h2>
+            <div class="task-item"><div class="task-property">Myrtle Ave, Unit 101</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Bedroom windows screens request</div><div class="task-action"><span class="task-action-label">Action:</span> Decide: Should we proceed (Y/N)? Determine who to send.</div></div>
+            <div class="task-item"><div class="task-property">General</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Wave Account - Vendor Invoicing</div><div class="task-action"><span class="task-action-label">Action:</span> Set this up ASAP</div></div>
+            <div class="task-item"><div class="task-property">25R Burwell Ave, Stoney Creek</div><div class="task-issue"><span class="task-issue-label">Issue:</span> New Property</div><div class="task-action"><span class="task-action-label">Action:</span> New client emailed; Maya responded and cc'd Tricia. Next steps pending.</div></div>
+            <div class="task-item"><div class="task-property">General</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Scotia Bank</div><div class="task-action"><span class="task-action-label">Action:</span> Notifications not helpful. Explore account access options and report back.</div></div>
+            <div class="task-item"><div class="task-property">General</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Utilities</div><div class="task-action"><span class="task-action-label">Action:</span> Utility sheet now updated. Meet with Maya to review so she can invoice tenants.</div></div>
+            <div class="task-item"><div class="task-property">General</div><div class="task-issue"><span class="task-issue-label">Issue:</span> TenantCloud Account Cleanup</div><div class="task-action"><span class="task-action-label">Action:</span> Clean up overdue accounts and utility billings in TenantCloud.</div></div>
+            <div class="task-item"><div class="task-property">Mohawk</div><div class="task-issue"><span class="task-issue-label">Issue:</span> City of Hamilton - Notice of Violation (Discarded items - Mirror)</div><div class="task-action"><span class="task-action-label">Action:</span> Follow up on city violation notice. Determine remedy and next steps.</div></div>
+            <div class="task-item"><div class="task-property">4-130 Wellington St</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Madison Greaves - Rent Discount Request</div><div class="task-action"><span class="task-action-label">Action:</span> Create CMA and send to landlord for review.</div></div>
+            <div class="task-item"><div class="task-property">West 4th, Unit 1</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Process Mike Herron invoice - $60.71 microwave</div><div class="task-action"><span class="task-action-label">Action:</span> Invoice received via TenantCloud. Review and process payment.</div></div>
+            <div class="task-item"><div class="task-property">Mohawk, Unit 2</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron Invoice - $465.30</div><div class="task-action"><span class="task-action-label">Action:</span> Mike messaged directly about this invoice. Review and process payment.</div></div>
+            <div class="task-item"><div class="task-property">Thayer, Unit 2</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Electrician needed - outlet issue</div><div class="task-action"><span class="task-action-label">Action:</span> Mike Herron confirmed electrical outlet issue (not ceiling fan). Contact electrician to schedule repair.</div></div>
+            <div class="task-item"><div class="task-property">Upper Wellington, Unit 2</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Vent blocking decision needed - Johnny Martinez</div><div class="task-action"><span class="task-action-label">Action:</span> Tenant unsure if he can block vents. Make decision and communicate to tenant.</div></div>
+            <div class="task-item"><div class="task-property">San Fernando</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron Invoice - $1,651.11</div><div class="task-action"><span class="task-action-label">Action:</span> Mike messaged directly about this invoice. Review and process payment.</div></div>
+            <div class="task-item"><div class="task-property">Upper Wellington, Unit ???</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Smoking Issue</div><div class="task-action"><span class="task-action-label">Action:</span> Email sent to tenant. If repeated, escalate and send formal LTB notice.</div></div>
+            <div class="task-item"><div class="task-property">Ferndale, Unit 2</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Lawn care complaint - grass overdue for mowing</div><div class="task-action"><span class="task-action-label">Action:</span> Tenant Caitlyn Jones reports lawn not cut in over a week. Contact Omar (assigned vendor) to schedule immediately.</div></div>
+            <div class="task-item"><div class="task-property">General</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Process On Demand Handyman Invoice 111</div><div class="task-action"><span class="task-action-label">Action:</span> Invoice $932.25 due May 15. Forward from Tricia. Review and process payment.</div></div>
+            <div class="task-item"><div class="task-property">Grandfield, Unit 1</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Follow up wall leak - vendor not patching</div><div class="task-action"><span class="task-action-label">Action:</span> Tenant Khristian Xu reporting water marks. Vendor not patching properly. Escalate with vendor and require remediation.</div></div>
+            <div class="task-item"><div class="task-property">Thayer, Unit 1</div><div class="task-issue"><span class="task-issue-label">Issue:</span> Mike Herron invoice - $226.78</div><div class="task-action"><span class="task-action-label">Action:</span> Invoice via TenantCloud. Review and process payment.</div></div>
+        </div>
+        <div class="footer"><p>TPS Property Management Operations List | Updated: Today</p></div>
+    </div>
+</body>
+</html>
