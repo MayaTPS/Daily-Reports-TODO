@@ -387,7 +387,63 @@
         }
 
         .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 12px;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .assignee-tag {
+            background: var(--tps-gold);
+            color: white;
+            font-size: 0.75em;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-label {
+            font-size: 0.75em;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .task-card.needs-approval .status-label {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .task-card.in-progress .status-label {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .task-card.open .status-label {
+            background: #f8f9fa;
+            border-color: var(--border);
+            color: var(--text-muted);
+        }
+
+        .task-card.done .status-label {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
         }
 
         .task-property {
