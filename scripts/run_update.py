@@ -12,9 +12,10 @@ from google.oauth2.service_account import Credentials
 
 SHEET=os.environ.get("SPREADSHEET_ID","1PETs8uNdhJyLs0VibspKZk1Jts8hqQcaFcxKWneBiQ4")
 OPS_TAB="Operations Log"; ARC_TAB="Archive"; HTML="index.html"
-C_PROP,C_TASK,C_NOTE,C_ASGN,C_STAT,C_PRI=2,3,4,7,8,6
-A_PROP,A_TASK,A_NOTE,A_ASGN,A_STAT,A_DATE,A_DATE_DONE=2,3,8,6,7,1,10
+C_PROP,C_TASK,C_NOTE,C_ASGN,C_STAT,C_PRI,C_DATE=2,3,4,7,8,6,1
+A_PROP,A_TASK,A_NOTE,A_ASGN,A_STAT,A_DATE_DONE=2,3,8,6,7,10
 VALID={"tricia","trish","maya"}
+DATE_FMTS=("%m/%d/%Y","%Y-%m-%d","%d/%m/%Y","%m/%d/%y","%-m/%-d/%Y","%-m/%-d/%y")
 
 def auth():
     raw=os.environ.get("GOOGLE_CREDENTIALS")
@@ -30,6 +31,14 @@ def g(r,i,d=""):
 def mkd(a,b): return " | ".join(x.strip() for x in [a,b] if x.strip())
 def esc(s): return s.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace('"',"&quot;")
 
+def parse_date(s):
+    """Try multiple date formats, return datetime or None."""
+    if not s: return None
+    for fmt in DATE_FMTS:
+        try: return datetime.strptime(s,fmt)
+        except: pass
+    return None
+
 def get_ops(c):
     out=[]
     for r in c.open_by_key(SHEET).worksheet(OPS_TAB).get_all_values()[2:]:
@@ -37,56 +46,45 @@ def get_ops(c):
         p=g(r,C_PROP); t=g(r,C_TASK)
         if not p and not t: continue
         if g(r,C_ASGN).lower() not in VALID: continue
-        out.append({"p":p,"d":mkd(t,g(r,C_NOTE)),"a":g(r,C_ASGN),"s":g(r,C_STAT),"pri":g(r,C_PRI)})
+        out.append({
+            "p":p,"d":mkd(t,g(r,C_NOTE)),
+            "a":g(r,C_ASGN),"s":g(r,C_STAT),
+            "pri":g(r,C_PRI),"dt":g(r,C_DATE)
+        })
+    # Sort: newest Needs Approval first, then new items (newest date), then older Needs Approval, then rest
+    def sort_key(x):
+        s=x["s"].lower(); dt=parse_date(x["dt"])
+        ts=dt.timestamp() if dt else 0
+        if s=="needs approval" and ts>=(datetime.now()-timedelta(days=7)).timestamp(): return (0,-ts)
+        if s!="needs approval" and ts>=(datetime.now()-timedelta(days=7)).timestamp(): return (1,-ts)
+        if s=="needs approval": return (2,-ts)
+        return (3,-ts)
+    out.sort(key=sort_key)
     return out
 
 def get_arc(c):
     sp=c.open_by_key(SHEET)
-    # Archive tab: rows 23-30 in spreadsheet = indices 20-27 in all_rows after [2:] slice
     try: ws=sp.worksheet(ARC_TAB)
     except: ws=sp.worksheets()[6]
-    all_rows=ws.get_all_values()[2:]
     cut=datetime.now()-timedelta(days=7)
-    recent=[]; pool=[]
-    for idx,r in enumerate(all_rows):
+    recent=[]
+    for r in ws.get_all_values()[2:]:
         if not any(r): continue
         t=g(r,A_TASK)
         if not t: continue
-        date_val=g(r,A_DATE_DONE) or g(r,A_DATE)
-        it={"p":g(r,A_PROP),"d":mkd(t,g(r,A_NOTE)),"a":g(r,A_ASGN),"s":g(r,A_STAT),"dt":date_val}
-        pool.append(it)
-        if 20<=idx<=27:
-            recent.append(it)
-            continue
-        if date_val:
-            for fmt in ("%m/%d/%Y","%Y-%m-%d","%d/%m/%Y","%m/%d/%y"):
-                try:
-                    if datetime.strptime(date_val,fmt)>=cut:
-                        if it not in recent: recent.append(it)
-                    break
-                except: pass
-    try:
-        ops_rows=sp.worksheet(OPS_TAB).get_all_values()[2:]
-        for r in ops_rows:
-            if not any(r): continue
-            t=g(r,C_TASK)
-            if not t: continue
-            if g(r,C_STAT).lower()!="done": continue
-            if g(r,C_ASGN).lower() not in VALID: continue
-            it={"p":g(r,C_PROP),"d":mkd(t,g(r,C_NOTE)),"a":g(r,C_ASGN),"s":"Done","dt":g(r,1)}
-            if it not in recent: recent.append(it)
-    except Exception as e:
-        print(f"Warning: could not read Done items from Ops Log: {e}")
-    seen=set(); deduped=[]
-    for it in recent:
-        key=(it["p"],it["d"])
-        if key not in seen: seen.add(key); deduped.append(it)
-    if len(deduped)<4:
-        for x in pool:
-            key=(x["p"],x["d"])
-            if key not in seen: seen.add(key); deduped.append(x)
-            if len(deduped)>=8: break
-    return deduped[:8]
+        # Use column K (Date Completed, index 10) as the filter date
+        date_val=g(r,A_DATE_DONE)
+        dt=parse_date(date_val)
+        if dt and dt>=cut:
+            recent.append({
+                "p":g(r,A_PROP),"d":mkd(t,g(r,A_NOTE)),
+                "a":g(r,A_ASGN),"s":g(r,A_STAT),"dt":date_val
+            })
+    # Sort by Date Completed descending (newest first)
+    recent.sort(key=lambda x: parse_date(x["dt"]) or datetime.min, reverse=True)
+    print(f"  Archive last-7-days items: {len(recent)}")
+    for it in recent: print(f"    {it['dt']} | {it['p']} - {it['d'][:60]}")
+    return recent
 
 def card(t):
     p=esc(t["p"]); d=esc(t["d"]); a=esc(t["a"]); s=t["s"]
@@ -147,7 +145,7 @@ def inject(ops,arc):
 def main():
     print("Connecting..."); c=auth()
     print("Reading ops log..."); ops=get_ops(c); print(f"  {len(ops)} tasks")
-    print("Reading archive..."); arc=get_arc(c); print(f"  {len(arc)} items")
+    print("Reading archive..."); arc=get_arc(c)
     inject(ops,arc)
 
 if __name__=="__main__": main()
