@@ -31,7 +31,7 @@ ARCHIVE_TAB = "📦 Archive"
 INDEX_HTML = "index.html"
 
 # Category and status order
-CATEGORY_ORDER = ["Admin", "Maintenance", "Financial", "Inspection", "Legal", "Leasing", "Tenant Request", "General"]
+CATEGORY_ORDER = ["Operations & Admin", "Leasing & Marketing", "Maintenance & Repairs", "Financials & Accounting", "Tenant Relations"]
 STATUS_ORDER = ["Stuck", "Maya Needs Help", "New", "In Progress", "FYI Only"]
 
 # Status values (exact match from sheet)
@@ -338,26 +338,20 @@ def inject_into_html(tasks_by_category_status, archive_items):
     # Inject each section
     markers = {
         "QUICK_WINS": ("<!-- QUICK_WINS_START -->", "<!-- QUICK_WINS_END -->"),
-        "ADMIN": ("<!-- ADMIN_START -->", "<!-- ADMIN_END -->"),
-        "MAINTENANCE": ("<!-- MAINTENANCE_START -->", "<!-- MAINTENANCE_END -->"),
-        "FINANCIAL": ("<!-- FINANCIAL_START -->", "<!-- FINANCIAL_END -->"),
-        "INSPECTION": ("<!-- INSPECTION_START -->", "<!-- INSPECTION_END -->"),
-        "LEGAL": ("<!-- LEGAL_START -->", "<!-- LEGAL_END -->"),
-        "LEASING": ("<!-- LEASING_START -->", "<!-- LEASING_END -->"),
-        "TENANT_REQUEST": ("<!-- TENANT_REQUEST_START -->", "<!-- TENANT_REQUEST_END -->"),
-        "GENERAL": ("<!-- GENERAL_START -->", "<!-- GENERAL_END -->"),
+        "OPERATIONS_ADMIN": ("<!-- OPERATIONS_ADMIN_START -->", "<!-- OPERATIONS_ADMIN_END -->"),
+        "LEASING_MARKETING": ("<!-- LEASING_MARKETING_START -->", "<!-- LEASING_MARKETING_END -->"),
+        "MAINTENANCE_REPAIRS": ("<!-- MAINTENANCE_REPAIRS_START -->", "<!-- MAINTENANCE_REPAIRS_END -->"),
+        "FINANCIALS_ACCOUNTING": ("<!-- FINANCIALS_ACCOUNTING_START -->", "<!-- FINANCIALS_ACCOUNTING_END -->"),
+        "TENANT_RELATIONS": ("<!-- TENANT_RELATIONS_START -->", "<!-- TENANT_RELATIONS_END -->"),
     }
 
     # Map category names to marker keys
     category_markers = {
-        "Admin": "ADMIN",
-        "Maintenance": "MAINTENANCE",
-        "Financial": "FINANCIAL",
-        "Inspection": "INSPECTION",
-        "Legal": "LEGAL",
-        "Leasing": "LEASING",
-        "Tenant Request": "TENANT_REQUEST",
-        "General": "GENERAL",
+        "Operations & Admin": "OPERATIONS_ADMIN",
+        "Leasing & Marketing": "LEASING_MARKETING",
+        "Maintenance & Repairs": "MAINTENANCE_REPAIRS",
+        "Financials & Accounting": "FINANCIALS_ACCOUNTING",
+        "Tenant Relations": "TENANT_RELATIONS",
     }
 
     for category, marker_key in category_markers.items():
