@@ -1,22 +1,12 @@
 name: Daily Dashboard Update
-
 on:
   schedule:
-    # Daily at 7 AM Ontario time (EDT = 11 AM UTC, EST = 12 PM UTC)
-    # Currently set to EDT (summer time)
-    # If winter, change to: - cron: '0 12 * * *'
-    - cron: '0 11 * * *'
-
-  # Manual trigger from GitHub Actions tab
+    - cron: '0 11 * * *'  # 7 AM EDT (11 AM UTC)
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   update-dashboard:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,20 +17,18 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: |
-          pip install gspread google-auth
+        run: pip install gspread google-auth-oauthlib
 
-      - name: Run dashboard generation script
+      - name: Generate and update dashboard
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-          SPREADSHEET_ID: 1PETs8uNdhJyLs0VibspKZk1Jts8hqQcaFcxKWneBiQ4
+          SPREADSHEET_ID: '1G2JYQp-zvGEHEbBIJuniRG3itq0ysNdOGuVsy-WGKg4'
         run: python scripts/generate_dashboard.py
 
-      - name: Commit and push updated dashboard
+      - name: Commit and push changes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
           git add index.html
-          git diff --staged --quiet || git commit -m "chore: daily dashboard update $(date +'%Y-%m-%d %H:%M UTC')"
+          git commit -m "Dashboard update: $(date)" || echo "No changes to commit"
           git push
-          
