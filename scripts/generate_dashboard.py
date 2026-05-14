@@ -65,18 +65,28 @@ def fetch_operations_log(client):
     sheet = client.open_by_key(SPREADSHEET_ID)
     ws = sheet.worksheet(OPS_LOG_TAB)
 
-    # Get all values to find the actual header row (skip decorative/blank rows)
+    # Get all values as raw data
     all_values = ws.get_all_values()
 
-    # Find the row with actual headers (contains "Task / Issue" or similar)
-    header_row_idx = 0
+    # Find header row (contains "Task / Issue")
+    header_idx = 0
+    headers = None
     for idx, row in enumerate(all_values):
-        if any("Task" in str(cell) or "Status" in str(cell) for cell in row):
-            header_row_idx = idx
+        if "Task / Issue" in row:
+            header_idx = idx
+            headers = row
             break
 
-    # Get records starting from the actual header row
-    rows = ws.get_all_records(expected_headers=all_values[header_row_idx])
+    if not headers:
+        print("  WARNING: Could not find header row with 'Task / Issue'")
+        return {
+            STATUS_NEEDS_APPROVAL: [],
+            STATUS_MAYA_NEEDS_HELP: [],
+            STATUS_NEW: [],
+            STATUS_IN_PROGRESS: [],
+            STATUS_STUCK: [],
+            STATUS_FYI_ONLY: [],
+        }
 
     # Initialize status categories
     tasks_by_status = {
@@ -88,22 +98,32 @@ def fetch_operations_log(client):
         STATUS_FYI_ONLY: [],
     }
 
-    for row in rows:
-        # Skip empty rows
-        if not row.get("Task / Issue"):
+    # Process data rows (skip header and everything before it)
+    for row in all_values[header_idx + 1:]:
+        if not any(row):  # Skip completely empty rows
             continue
 
-        status = row.get("Status", "").strip()
+        # Create a dict from headers and row values
+        row_dict = {}
+        for i, header in enumerate(headers):
+            row_dict[header] = row[i] if i < len(row) else ""
+
+        # Skip if no task
+        task = row_dict.get("Task / Issue", "").strip()
+        if not task:
+            continue
+
+        status = row_dict.get("Status", "").strip()
         if status not in tasks_by_status:
             continue  # Skip items with unknown status
 
         task_data = {
-            "property": row.get("Property", "").strip(),
-            "task": row.get("Task / Issue", "").strip(),
-            "notes": row.get("Notes", "").strip(),
-            "assigned": row.get("Assigned To", "").strip(),
-            "priority": row.get("Priority", "").strip(),
-            "category": row.get("Category", "").strip(),
+            "property": row_dict.get("Property", "").strip(),
+            "task": task,
+            "notes": row_dict.get("Notes", "").strip(),
+            "assigned": row_dict.get("Assigned To", "").strip(),
+            "priority": row_dict.get("Priority", "").strip(),
+            "category": row_dict.get("Category", "").strip(),
             "status": status,
         }
 
@@ -116,31 +136,45 @@ def fetch_archive(client, limit=9):
     sheet = client.open_by_key(SPREADSHEET_ID)
     ws = sheet.worksheet(ARCHIVE_TAB)
 
-    # Get all values to find the actual header row (skip decorative/blank rows)
+    # Get all values as raw data
     all_values = ws.get_all_values()
 
-    # Find the row with actual headers
-    header_row_idx = 0
+    # Find header row
+    header_idx = 0
+    headers = None
     for idx, row in enumerate(all_values):
-        if any("Task" in str(cell) or "Status" in str(cell) for cell in row):
-            header_row_idx = idx
+        if "Task / Issue" in row or "Task" in row:
+            header_idx = idx
+            headers = row
             break
 
-    # Get records starting from the actual header row
-    rows = ws.get_all_records(expected_headers=all_values[header_row_idx])
+    if not headers:
+        print("  WARNING: Could not find header row in Archive sheet")
+        return []
 
     items = []
-    for row in reversed(rows):  # Reverse to get newest first
-        if not row.get("Task / Issue"):
+    # Process data rows in reverse order (newest first)
+    for row in reversed(all_values[header_idx + 1:]):
+        if not any(row):  # Skip empty rows
+            continue
+
+        # Create a dict from headers and row values
+        row_dict = {}
+        for i, header in enumerate(headers):
+            row_dict[header] = row[i] if i < len(row) else ""
+
+        # Skip if no task
+        task = row_dict.get("Task / Issue", "").strip()
+        if not task:
             continue
 
         items.append({
-            "property": row.get("Property", "").strip(),
-            "task": row.get("Task / Issue", "").strip(),
-            "notes": row.get("Notes", "").strip(),
-            "assigned": row.get("Assigned To", "").strip(),
-            "priority": row.get("Priority", "").strip(),
-            "category": row.get("Category", "").strip(),
+            "property": row_dict.get("Property", "").strip(),
+            "task": task,
+            "notes": row_dict.get("Notes", "").strip(),
+            "assigned": row_dict.get("Assigned To", "").strip(),
+            "priority": row_dict.get("Priority", "").strip(),
+            "category": row_dict.get("Category", "").strip(),
         })
 
         if len(items) >= limit:
