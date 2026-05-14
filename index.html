@@ -3,903 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TPS Operations</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>TPS Operations Dashboard</title>
     <style>
+        :root {
+            --gold: #D4AF95;
+            --purple: #764ba2;
+            --dark-bg: #1a1a1a;
+            --light-text: #f0f0f0;
+            --border: #333;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --tps-gold: #B8860B;
-            --tps-gold-light: #D4AF37;
-            --tps-gray: #5a5a5a;
-            --tps-gray-light: #8a8a8a;
-            --bg-primary: #ffffff;
-            --bg-secondary: #fafaf8;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --text-muted: #999999;
-            --border: #e5e5e5;
-            --status-stuck: #DC2626;
-            --status-pending: #D97706;
-            --status-inprogress: #2563EB;
-            --status-done: #16A34A;
-        }
-
-        body.dark-mode {
-            --bg-primary: #0f0f0d;
-            --bg-secondary: #1a1a18;
-            --text-primary: #f0f0ed;
-            --text-secondary: #b8b8b3;
-            --text-muted: #808078;
-            --border: #2a2a28;
-        }
-
-        html, body {
-            height: 100%;
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
-            line-height: 1.5;
-        }
-
-        /* NAVBAR */
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .navbar-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .navbar-logo {
-            width: 28px;
-            height: 28px;
-            background: var(--tps-gold);
-            clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 100% 100%, 0% 100%, 0% 50%);
-        }
-
-        .navbar-title {
-            font-size: 1em;
-            font-weight: 600;
-            color: var(--text-primary);
-            letter-spacing: -0.3px;
-        }
-
-        .navbar-right {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .navbar-btn {
-            padding: 7px 14px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text-primary);
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.85em;
-            transition: all 0.2s ease;
-        }
-
-        .navbar-btn:hover {
-            border-color: var(--tps-gold);
-            color: var(--tps-gold);
-        }
-
-        .navbar-btn.primary {
-            background: var(--tps-gold);
-            color: white;
-            border-color: var(--tps-gold);
-        }
-
-        .navbar-btn.primary:hover {
-            background: var(--tps-gold-light);
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 22px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--border);
-            transition: 0.3s;
-            border-radius: 11px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--tps-gold);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(18px);
-        }
-
-        /* MAIN CONTAINER */
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 32px 30px;
-        }
-
-        /* PAGE HEADER */
-        .page-header {
-            margin-bottom: 32px;
-        }
-
-        .page-title {
-            font-size: 2.2em;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 6px;
-            letter-spacing: -0.5px;
-        }
-
-        .page-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.95em;
-        }
-
-        /* QUICK CARDS */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-            margin-bottom: 36px;
-        }
-
-        .quick-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 7px;
-            padding: 20px;
-            transition: all 0.2s ease;
-        }
-
-        .quick-card:hover {
-            border-color: var(--tps-gold);
-            box-shadow: 0 4px 12px rgba(184, 134, 11, 0.08);
-        }
-
-        .card-icon {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-
-        .card-label {
-            font-size: 0.7em;
-            color: var(--tps-gold);
-            font-weight: 600;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-
-        .card-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 10px;
-        }
-
-        .card-content {
-            font-size: 0.9em;
-            color: var(--text-secondary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--light-text);
             line-height: 1.6;
-            margin-bottom: 12px;
         }
 
-        .card-input {
-            width: 100%;
-            padding: 8px 10px;
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: 2px solid var(--gold);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: var(--gold);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .section {
+            background-color: #222;
             border: 1px solid var(--border);
-            border-radius: 5px;
-            font-size: 0.85em;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            transition: all 0.2s;
+            border-left: 4px solid var(--gold);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 25px;
         }
 
-        .card-input:focus {
-            outline: none;
-            border-color: var(--tps-gold);
-            background: var(--bg-primary);
-        }
-
-        /* WINS SECTION */
-        .wins-section {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 7px;
-            padding: 24px;
-            margin-bottom: 36px;
-        }
-
-        .wins-section h2 {
-            font-size: 1.15em;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .wins-section p {
-            font-size: 0.85em;
-            color: var(--text-muted);
-            margin-bottom: 14px;
-        }
-
-        .wins-list {
-            list-style: none;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 12px;
-        }
-
-        .wins-list li {
-            padding: 10px 12px;
-            background: var(--bg-secondary);
-            border-radius: 5px;
-            color: var(--text-secondary);
-            font-size: 0.9em;
-            border-left: 3px solid var(--status-done);
-            display: flex;
-            gap: 8px;
-            align-items: flex-start;
-        }
-
-        .wins-list li:before {
-            content: "✓";
-            color: var(--status-done);
-            font-weight: 700;
-            font-size: 1em;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        /* SECTION HEADER */
-        .section-header {
+        .section h2 {
+            font-size: 18px;
+            color: var(--gold);
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 18px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .section-icon {
-            font-size: 1.4em;
-        }
-
-        .section-title {
-            font-size: 1.05em;
-            font-weight: 600;
-            color: var(--text-primary);
-            letter-spacing: 0.2px;
+            gap: 10px;
         }
 
         .section-count {
-            background: var(--tps-gold);
-            color: white;
-            font-size: 0.75em;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: auto;
-        }
-
-        /* TASK CARD */
-        .task-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 7px;
-            padding: 16px;
-            margin-bottom: 10px;
-            transition: all 0.2s ease;
-        }
-
-        .task-card:hover {
-            border-color: var(--tps-gold);
-            box-shadow: 0 4px 12px rgba(184, 134, 11, 0.08);
-        }
-
-        .task-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .task-description {
-            font-size: 0.95em;
-            color: var(--text-primary);
-            font-weight: 500;
-            line-height: 1.4;
-            flex: 1;
-        }
-
-        .task-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-
-        .status-badge {
             display: inline-block;
-            padding: 3px 9px;
+            background-color: var(--purple);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .task-item {
+            background-color: #2a2a2a;
+            padding: 15px;
+            margin-bottom: 12px;
             border-radius: 4px;
-            font-size: 0.7em;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            white-space: nowrap;
+            border-left: 3px solid var(--purple);
         }
 
-        .status-badge.stuck {
-            background: rgba(220, 38, 38, 0.12);
-            color: var(--status-stuck);
-        }
-
-        .status-badge.pending {
-            background: rgba(217, 119, 6, 0.12);
-            color: var(--status-pending);
-        }
-
-        .status-badge.inprogress {
-            background: rgba(37, 99, 235, 0.12);
-            color: var(--status-inprogress);
-        }
-
-        .status-badge.done {
-            background: rgba(22, 163, 74, 0.12);
-            color: var(--status-done);
-        }
-
-        .status-badge.approval {
-            background: rgba(184, 134, 11, 0.15);
-            color: var(--tps-gold);
+        .task-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--light-text);
         }
 
         .task-meta {
-            font-size: 0.8em;
-            color: var(--text-muted);
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+            font-size: 12px;
+            color: #999;
         }
 
-        .task-meta span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
+        .quick-win-item {
+            background-color: #2a2a2a;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 3px solid var(--gold);
+            font-size: 14px;
         }
 
-        /* APPROVAL CONTROLS */
+        .empty-state {
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+        }
+
         .task-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border);
-            flex-wrap: wrap;
-            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #333;
         }
 
         .btn-group {
             display: flex;
-            gap: 5px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
-        .btn-control {
-            padding: 5px 11px;
-            border: 1.5px solid var(--border);
-            background: transparent;
-            color: var(--text-secondary);
+        button {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: 1px solid var(--gold);
+            background-color: transparent;
+            color: var(--gold);
             border-radius: 4px;
             cursor: pointer;
-            font-weight: 500;
-            font-size: 0.75em;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .btn-control:hover {
-            border-color: var(--tps-gold);
-            color: var(--tps-gold);
-        }
-
-        .btn-control.active {
-            background: var(--tps-gold);
-            color: white;
-            border-color: var(--tps-gold);
-        }
-
-        .task-note input {
-            flex: 1;
-            min-width: 140px;
-            padding: 5px 10px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 0.8em;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
             transition: all 0.2s;
         }
 
-        .task-note input:focus {
-            outline: none;
-            border-color: var(--tps-gold);
+        button:hover {
+            background-color: var(--gold);
+            color: var(--dark-bg);
         }
 
-        /* UPLOAD SECTION */
-        .upload-section {
-            background: var(--bg-primary);
-            border: 1px dashed var(--border);
-            border-radius: 7px;
-            padding: 32px;
-            text-align: center;
-            margin-bottom: 36px;
-            transition: all 0.2s ease;
-        }
-
-        .upload-section:hover {
-            border-color: var(--tps-gold);
-            box-shadow: 0 4px 12px rgba(184, 134, 11, 0.08);
-        }
-
-        .upload-icon {
-            font-size: 2.4em;
-            margin-bottom: 12px;
-        }
-
-        .upload-title {
-            font-size: 1.15em;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 6px;
-        }
-
-        .upload-text {
-            color: var(--text-secondary);
-            margin-bottom: 14px;
-            font-size: 0.9em;
-        }
-
-        .upload-btn {
-            display: inline-block;
-            background: var(--tps-gold);
-            color: white;
-            padding: 10px 24px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9em;
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .upload-btn:hover {
-            background: var(--tps-gold-light);
-            transform: translateY(-2px);
-        }
-
-        /* CATEGORY SECTION */
-        .category-section {
-            margin-bottom: 32px;
-        }
-
-        .tasks-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-
-        /* MODAL */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--bg-primary);
-            border-radius: 8px;
+        input[type="text"] {
             width: 100%;
-            max-width: 650px;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            animation: slideUp 0.3s ease;
+            padding: 8px;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            color: var(--light-text);
+            border-radius: 4px;
+            margin-top: 8px;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            padding: 24px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-size: 1.35em;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            font-size: 1.6em;
-            color: var(--text-secondary);
-            cursor: pointer;
-            border: none;
-            background: none;
-            padding: 0;
-            transition: color 0.2s;
-        }
-
-        .modal-close:hover {
-            color: var(--tps-gold);
-        }
-
-        .modal-body {
-            padding: 24px;
-        }
-
-        .summary-item {
-            padding: 14px;
-            background: var(--bg-secondary);
-            border-radius: 5px;
-            margin-bottom: 10px;
-            border-left: 3px solid var(--tps-gold);
-        }
-
-        .summary-item-title {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-            font-size: 0.95em;
-        }
-
-        .summary-item-status {
-            font-size: 0.8em;
-            color: var(--tps-gold);
-            margin-bottom: 4px;
-        }
-
-        .summary-item-note {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            font-style: italic;
-        }
-
-        .empty-state {
+        footer {
             text-align: center;
-            padding: 32px 20px;
-            color: var(--text-muted);
-            font-size: 0.9em;
-        }
-
-        @media (max-width: 768px) {
-            .page-title {
-                font-size: 1.6em;
-            }
-
-            .navbar {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .navbar-left, .navbar-right {
-                width: 100%;
-            }
-
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .wins-list {
-                grid-template-columns: 1fr;
-            }
-
-            .task-controls {
-                flex-direction: column;
-            }
-
-            .btn-group, .task-note input {
-                width: 100%;
-            }
-
-            .task-right {
-                align-items: flex-start;
-            }
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: #666;
+            font-size: 12px;
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="navbar-left">
-            <div class="navbar-logo"></div>
-            <div class="navbar-title">TPS Operations</div>
-        </div>
-        <div class="navbar-right">
-            <button class="navbar-btn primary" onclick="showSummary()">📊 Summary</button>
-            <label class="navbar-btn" style="border: none; background: transparent; padding: 0; margin: 0;">
-                <label class="toggle-switch">
-                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
-                    <span class="slider"></span>
-                </label>
-            </label>
-        </div>
-    </nav>
-
-    <!-- MAIN CONTENT -->
     <div class="container">
-        <!-- PAGE HEADER -->
-        <div class="page-header">
-            <h1 class="page-title">Operations Dashboard</h1>
-            <p class="page-subtitle">Today's priorities and decisions</p>
-        </div>
+        <header>
+            <h1>⚙️ TPS Operations Hub</h1>
+            <p class="subtitle">Lab Tracker Dashboard — Live from Google Sheets</p>
+        </header>
 
-        <!-- QUICK CARDS -->
-        <div class="cards-grid">
-            <div class="quick-card">
-                <div class="card-icon">📅</div>
-                <div class="card-label">Meeting</div>
-                <div class="card-title">Tricia Check-in</div>
-                <div class="card-content"><strong>9:30 AM</strong> — Daily sync</div>
-                <input type="text" class="card-input" placeholder="Alternative time?">
-            </div>
-
-            <div class="quick-card">
-                <div class="card-icon">💳</div>
-                <div class="card-label">Payment</div>
-                <div class="card-title">Maya's Invoice</div>
-                <div class="card-content">April invoice ready</div>
-                <a href="https://wise.com/pay/r/U36Y7yWMiwln8YY" style="color: var(--tps-gold); text-decoration: none; font-weight: 600; display: inline-block;">Pay Now →</a>
-            </div>
-
-            <div class="quick-card">
-                <div class="card-icon">📁</div>
-                <div class="card-label">Upload</div>
-                <div class="card-title">Expenses & Invoices</div>
-                <div class="card-content">Drop everything here</div>
-                <a href="https://drive.google.com/drive/folders/1udSCvVZGOu7A1faxH65xQHF9kghy1_o4" target="_blank" style="color: var(--tps-gold); text-decoration: none; font-weight: 600; display: inline-block;">Upload →</a>
-            </div>
-        </div>
-
-        <!-- QUICK WINS -->
-        <div class="wins-section">
-            <div class="wins-header">
-                <h2>Quick Wins</h2>
-                <span class="wins-emoji">🎉</span>
-            </div>
-            <p class="last-updated">Closed items — May 14, 2026 at 01:57 PM EDT</p>
-            <div class="wins-grid">
-                <!-- ARCHIVE-START -->
-                <!-- Updated May 14, 2026 at 01:57 PM EDT -->
-                <div class="wins-item">5/6/2026 — Thayer, Unit 2</div>
-                <div class="wins-item">5/10/2026 — Mohawk, Unit 2</div>
-                <div class="wins-item">5/12/2026 — 245 Mohawk Rd E</div>
-                <div class="wins-item">5/14/2026 — Britannia, Unit 1</div>
-                <div class="wins-item">5/6/2026 — General</div>
-                <div class="wins-item">5/9/2026 — Upper Wellington</div>
-                <div class="wins-item">5/11/2026 — General</div>
-                <div class="wins-item">5/12/2026 — General</div>
-                <div class="wins-item">5/7/2026 — Mohawk</div>
-                <div class="wins-item">5/11/2026 — General</div>
-                <div class="wins-item">5/12/2026 — Myrtle Ave</div>
-                <div class="wins-item">5/6/2026 — 25R Burwell Ave Stoney Creek</div>
-                <!-- ARCHIVE-END -->
-            </div>
-        </div>
-
-        <!-- APPROVALS NEEDED -->
-        <div class="category-section">
-            <div class="section-header">
-                <span class="section-icon">🔶</span>
-                <span class="section-title">Approvals Needed</span>
+        <!-- NEEDS_APPROVAL Section -->
+        <section class="section">
+            <h2>
+                Needs Approval
                 <span class="section-count" id="approval-count">0</span>
+            </h2>
+            <div id="needs-approval-content">
+                <!-- NEEDS_APPROVAL_START -->
+                <p class="empty-state">Loading...</p>
+                <!-- NEEDS_APPROVAL_END -->
             </div>
-            <div class="tasks-list">
-                <!-- OPS-LOG-APPROVALS-START -->
-                <!-- Updated May 14, 2026 at 01:57 PM EDT -->
+        </section>
 
-                <!-- OPS-LOG-APPROVALS-END -->
+        <!-- MAYA_NEEDS_HELP Section -->
+        <section class="section">
+            <h2>
+                Maya Needs Help
+                <span class="section-count" id="help-count">0</span>
+            </h2>
+            <div id="maya-help-content">
+                <!-- MAYA_NEEDS_HELP_START -->
+                <p class="empty-state">Loading...</p>
+                <!-- MAYA_NEEDS_HELP_END -->
             </div>
-        </div>
+        </section>
 
-        <!-- IN PROGRESS -->
-        <div class="category-section">
-            <div class="section-header">
-                <span class="section-icon">⚙️</span>
-                <span class="section-title">In Progress</span>
-                <span class="section-count" id="inprogress-count">0</span>
-            </div>
-            <div class="tasks-list">
-                <!-- OPS-LOG-INPROGRESS-START -->
-                <!-- Updated May 14, 2026 at 01:57 PM EDT -->
-
-                <!-- OPS-LOG-INPROGRESS-END -->
-            </div>
-        </div>
-
-        <!-- NEW ITEMS -->
-        <div class="category-section">
-            <div class="section-header">
-                <span class="section-icon">📋</span>
-                <span class="section-title">New Items</span>
+        <!-- NEW_ITEMS Section -->
+        <section class="section">
+            <h2>
+                New Items
                 <span class="section-count" id="new-count">0</span>
+            </h2>
+            <div id="new-items-content">
+                <!-- NEW_ITEMS_START -->
+                <p class="empty-state">Loading...</p>
+                <!-- NEW_ITEMS_END -->
             </div>
-            <div class="tasks-list">
-                <!-- OPS-LOG-NEW-START -->
-                <!-- Updated May 14, 2026 at 01:57 PM EDT -->
+        </section>
 
-                <!-- OPS-LOG-NEW-END -->
+        <!-- IN_PROGRESS Section -->
+        <section class="section">
+            <h2>
+                In Progress
+                <span class="section-count" id="progress-count">0</span>
+            </h2>
+            <div id="in-progress-content">
+                <!-- IN_PROGRESS_START -->
+                <p class="empty-state">Loading...</p>
+                <!-- IN_PROGRESS_END -->
             </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- SUMMARY MODAL -->
-    <div class="modal-overlay" id="summaryModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Approval Summary</h2>
-                <button class="modal-close" onclick="closeSummary()">✕</button>
+        <!-- QUICK_WINS Section -->
+        <section class="section" style="border-left-color: var(--gold);">
+            <h2>
+                ✨ Quick Wins (Closed Items)
+                <span class="section-count" id="wins-count">0</span>
+            </h2>
+            <div id="quick-wins-content">
+                <!-- QUICK_WINS_START -->
+                <p class="empty-state">Loading...</p>
+                <!-- QUICK_WINS_END -->
             </div>
-            <div class="modal-body" id="summaryBody">
-                <div class="empty-state">No approvals submitted yet</div>
-            </div>
-        </div>
+        </section>
+
+        <footer>
+            <p>Last updated: <span id="update-time">Not yet</span></p>
+            <p>Automated daily at 7 AM EDT — Powered by GitHub Actions</p>
+        </footer>
     </div>
 
     <script>
-        const responses = {};
+        // Count items in each section
+        function updateCounts() {
+            const counts = {
+                'approval-count': document.querySelectorAll('#needs-approval-content .task-item').length,
+                'help-count': document.querySelectorAll('#maya-help-content .task-item').length,
+                'new-count': document.querySelectorAll('#new-items-content .task-item').length,
+                'progress-count': document.querySelectorAll('#in-progress-content .task-item').length,
+                'wins-count': document.querySelectorAll('#quick-wins-content .quick-win-item').length,
+            };
 
-        function setResponse(btn, status) {
-            const card = btn.closest('.task-card');
-            const description = card.querySelector('.task-description').textContent;
-
-            const siblings = btn.parentNode.querySelectorAll('.btn-control');
-            siblings.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            if (!responses[description]) {
-                responses[description] = {};
-            }
-            responses[description].status = status;
-        }
-
-        function updateNote(input) {
-            const card = input.closest('.task-card');
-            const description = card.querySelector('.task-description').textContent;
-
-            if (!responses[description]) {
-                responses[description] = {};
-            }
-            responses[description].note = input.value;
-        }
-
-        function showSummary() {
-            const modal = document.getElementById('summaryModal');
-            const body = document.getElementById('summaryBody');
-
-            const approvals = Object.entries(responses).filter(([_, data]) => data.status);
-            
-            if (approvals.length === 0) {
-                body.innerHTML = '<div class="empty-state">No approvals submitted yet</div>';
-            } else {
-                let html = '';
-                approvals.forEach(([item, data]) => {
-                    html += `
-                        <div class="summary-item">
-                            <div class="summary-item-title">${item}</div>
-                            <div class="summary-item-status">Decision: ${data.status}</div>
-                            ${data.note ? `<div class="summary-item-note">Note: ${data.note}</div>` : ''}
-                        </div>
-                    `;
-                });
-                body.innerHTML = html;
-            }
-
-            modal.classList.add('show');
-        }
-
-        function closeSummary() {
-            document.getElementById('summaryModal').classList.remove('show');
-        }
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-        }
-
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('darkModeToggle').checked = true;
-        }
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('summaryModal');
-            if (event.target === modal) {
-                modal.classList.remove('show');
+            for (const [id, count] of Object.entries(counts)) {
+                const elem = document.getElementById(id);
+                if (elem) elem.textContent = count;
             }
         }
+
+        // Remove "Loading..." placeholders if there's real content
+        function cleanupEmptyStates() {
+            ['needs-approval-content', 'maya-help-content', 'new-items-content', 'in-progress-content', 'quick-wins-content'].forEach(id => {
+                const container = document.getElementById(id);
+                const tasks = container.querySelectorAll('.task-item, .quick-win-item');
+                const emptyState = container.querySelector('.empty-state');
+
+                if (tasks.length > 0 && emptyState) {
+                    emptyState.remove();
+                }
+            });
+        }
+
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCounts();
+            cleanupEmptyStates();
+        });
     </script>
 </body>
 </html>
