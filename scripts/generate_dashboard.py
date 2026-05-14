@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 TPS Daily Dashboard Generator
-Reads Google Sheets Operations Log + Archive, generates fresh index.html
+Reads Google Sheets Operations Log + 📦 Archive, generates fresh index.html
 Runs daily at 7 AM EDT (11 AM UTC) via GitHub Actions
 
 Columns (A-I):
@@ -26,7 +26,7 @@ from google.oauth2.service_account import Credentials
 # Configuration
 SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID", "1PETs8uNdhJyLs0VibspKZk1Jts8hqQcaFcxKWneBiQ4")
 OPS_LOG_TAB = "Operations Log"
-ARCHIVE_TAB = "Archive"
+ARCHIVE_TAB = "📦 Archive"
 INDEX_HTML = "index.html"
 
 # Status values (exact match from sheet)
@@ -132,7 +132,7 @@ def fetch_operations_log(client):
     return tasks_by_status
 
 def fetch_archive(client, limit=9):
-    """Read Archive sheet and return last N items (newest first)."""
+    """Read 📦 Archive sheet and return last N items (newest first)."""
     sheet = client.open_by_key(SPREADSHEET_ID)
     ws = sheet.worksheet(ARCHIVE_TAB)
 
@@ -149,7 +149,7 @@ def fetch_archive(client, limit=9):
             break
 
     if not headers:
-        print("  WARNING: Could not find header row in Archive sheet")
+        print("  WARNING: Could not find header row in 📦 Archive sheet")
         return []
 
     items = []
@@ -330,7 +330,7 @@ def main():
         total_ops = sum(len(tasks) for tasks in ops_by_status.values())
         print(f"  Found {total_ops} tasks across all statuses")
 
-        print("Reading Archive...")
+        print("Reading 📦 Archive...")
         arc = fetch_archive(client, limit=9)
         print(f"  Found {len(arc)} archived items")
 
