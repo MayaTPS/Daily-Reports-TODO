@@ -24,9 +24,9 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 # Configuration
-SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID", "1PETs8uNdhJyLs0VibspKZk1Jts8hqQcaFcxKWneBiQ4")
+SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID", "1G2JYQp-zvGEHEbBIJuniRG3itq0ysNdOGuVsy-WGKg4")
 OPS_LOG_TAB = "Operations Log"
-ARCHIVE_TAB = "Archive"
+ARCHIVE_TAB = "📦 Archive"
 INDEX_HTML = "index.html"
 
 # Status values (exact match from sheet)
@@ -64,7 +64,19 @@ def fetch_operations_log(client):
     """Read Operations Log sheet and return tasks grouped by status."""
     sheet = client.open_by_key(SPREADSHEET_ID)
     ws = sheet.worksheet(OPS_LOG_TAB)
-    rows = ws.get_all_records()  # Returns list of dicts with headers as keys
+
+    # Get all values to find the actual header row (skip decorative/blank rows)
+    all_values = ws.get_all_values()
+
+    # Find the row with actual headers (contains "Task / Issue" or similar)
+    header_row_idx = 0
+    for idx, row in enumerate(all_values):
+        if any("Task" in str(cell) or "Status" in str(cell) for cell in row):
+            header_row_idx = idx
+            break
+
+    # Get records starting from the actual header row
+    rows = ws.get_all_records(expected_headers=all_values[header_row_idx])
 
     # Initialize status categories
     tasks_by_status = {
@@ -103,7 +115,19 @@ def fetch_archive(client, limit=9):
     """Read Archive sheet and return last N items (newest first)."""
     sheet = client.open_by_key(SPREADSHEET_ID)
     ws = sheet.worksheet(ARCHIVE_TAB)
-    rows = ws.get_all_records()
+
+    # Get all values to find the actual header row (skip decorative/blank rows)
+    all_values = ws.get_all_values()
+
+    # Find the row with actual headers
+    header_row_idx = 0
+    for idx, row in enumerate(all_values):
+        if any("Task" in str(cell) or "Status" in str(cell) for cell in row):
+            header_row_idx = idx
+            break
+
+    # Get records starting from the actual header row
+    rows = ws.get_all_records(expected_headers=all_values[header_row_idx])
 
     items = []
     for row in reversed(rows):  # Reverse to get newest first
