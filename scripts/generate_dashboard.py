@@ -24,9 +24,9 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 # Configuration
-SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID", "1G2JYQp-zvGEHEbBIJuniRG3itq0ysNdOGuVsy-WGKg4")
+SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID", "1PETs8uNdhJyLs0VibspKZk1Jts8hqQcaFcxKWneBiQ4")
 OPS_LOG_TAB = "Operations Log"
-ARCHIVE_TAB = "📦 Archive"
+ARCHIVE_TAB = "Archive"
 INDEX_HTML = "index.html"
 
 # Status values (exact match from sheet)
@@ -182,30 +182,54 @@ def fetch_archive(client, limit=9):
 
     return items
 
-def build_task_item(task):
-    """Generate HTML for a task item in a section."""
+def build_task_item(task, item_id=None):
+    """Generate HTML for a task item in a section (new dashboard format)."""
     property_val = html_escape(task.get("property", ""))
     task_text = html_escape(task.get("task", ""))
+    notes_text = html_escape(task.get("notes", ""))
     assigned = html_escape(task.get("assigned", ""))
     priority = html_escape(task.get("priority", ""))
+    status = task.get("status", "")
 
-    # Build title
-    title = f"{task_text}"
-    if property_val:
-        title = f"[{property_val}] {task_text}"
+    # Generate a simple ID if not provided
+    if not item_id:
+        item_id = f"task-{task_text[:10].replace(' ', '-')}"
 
-    # Build metadata
-    meta = []
+    # Build priority class (map to High/Medium/Low)
+    priority_class = "medium"
     if priority:
-        meta.append(f"Priority: {priority}")
-    if assigned:
-        meta.append(f"Assigned: {assigned}")
-    meta_str = " | ".join(meta) if meta else ""
+        priority_clean = priority.lower()
+        if "high" in priority_clean or "🔴" in priority:
+            priority_class = "high"
+        elif "low" in priority_clean or "🟢" in priority:
+            priority_class = "low"
+        elif "medium" in priority_clean or "🟡" in priority:
+            priority_class = "medium"
 
-    html = f'            <div class="task-item">\n'
-    html += f'                <div class="task-title">{title}</div>\n'
-    if meta_str:
-        html += f'                <div class="task-meta">{meta_str}</div>\n'
+    # Status class mapping
+    status_class_map = {
+        "Needs Approval": "status-approval",
+        "Maya Needs Help": "status-maya-help",
+        "New": "status-new",
+        "In Progress": "status-in-progress",
+        "Stuck": "status-stuck",
+        "FYI Only": "status-fyi",
+    }
+    status_class = status_class_map.get(status, "status-fyi")
+
+    html = f'            <div class="task-card">\n'
+    html += f'                <input type="checkbox" class="task-checkbox" onchange="toggleDescription(\'{item_id}\')">\n'
+    html += f'                <div class="task-info">\n'
+    if property_val:
+        html += f'                    <div class="task-location">{property_val}</div>\n'
+    html += f'                    <div class="task-title">{task_text}</div>\n'
+    if notes_text:
+        html += f'                    <div class="task-description" id="desc-{item_id}">{notes_text}</div>\n'
+    html += f'                </div>\n'
+    html += f'                <div class="task-right">\n'
+    html += f'                    <div class="priority-dot priority-{priority_class}"></div>\n'
+    html += f'                    <div class="task-status-badge {status_class}">{status}</div>\n'
+    html += f'                </div>\n'
     html += f'            </div>\n'
 
     return html
@@ -213,7 +237,7 @@ def build_task_item(task):
 def build_quick_wins(archive_items):
     """Generate HTML for Quick Wins section from archive items."""
     if not archive_items:
-        return '<p style="color: #999;">No recent completions</p>'
+        return '                <li>No recent completions</li>'
 
     items = []
     for item in archive_items:
@@ -232,7 +256,7 @@ def build_quick_wins(archive_items):
         if assigned:
             label += f" ({assigned})"
 
-        items.append(f'            <div class="quick-win-item">{label}</div>')
+        items.append(f'                <li>{label}</li>')
 
     return '\n'.join(items)
 
@@ -244,11 +268,18 @@ def inject_into_html(ops_tasks_by_status, archive_items):
     now = datetime.now().strftime("%B %d, %Y at %I:%M %p")
 
     # Build HTML for each status category
+    def build_section(tasks, status_name):
+        html = ""
+        for idx, task in enumerate(tasks):
+            item_id = f"{status_name.lower()}-{idx}"
+            html += build_task_item(task, item_id)
+        return html
+
     sections = {
-        "NEEDS_APPROVAL": "".join(build_task_item(t) for t in ops_tasks_by_status[STATUS_NEEDS_APPROVAL]),
-        "MAYA_NEEDS_HELP": "".join(build_task_item(t) for t in ops_tasks_by_status[STATUS_MAYA_NEEDS_HELP]),
-        "NEW_ITEMS": "".join(build_task_item(t) for t in ops_tasks_by_status[STATUS_NEW]),
-        "IN_PROGRESS": "".join(build_task_item(t) for t in ops_tasks_by_status[STATUS_IN_PROGRESS]),
+        "NEEDS_APPROVAL": build_section(ops_tasks_by_status[STATUS_NEEDS_APPROVAL], "approval"),
+        "MAYA_NEEDS_HELP": build_section(ops_tasks_by_status[STATUS_MAYA_NEEDS_HELP], "maya"),
+        "NEW_ITEMS": build_section(ops_tasks_by_status[STATUS_NEW], "new"),
+        "IN_PROGRESS": build_section(ops_tasks_by_status[STATUS_IN_PROGRESS], "progress"),
         "QUICK_WINS": build_quick_wins(archive_items),
     }
 
