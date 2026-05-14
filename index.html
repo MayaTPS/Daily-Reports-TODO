@@ -756,135 +756,18 @@
                 <!-- ARCHIVE-END -->
             </div>
         </div>
-            <p>Locked in this week</p>
-            <ul class="wins-list">
-                <li>Maya to set up Interactive Dashboard</li>
-                <li>Process On Demand Handyman Invoice 111</li>
-                <li>Mohawk — City violation documentation</li>
-                <li>Tenant Utility Charge Back processed</li>
-                <li>Myrtle Ave Utility Charge Back</li>
-                <li>25R Burwell Ave — New Property</li>
-                <li>Thayer Unit 2 — Bathroom Ventilation</li>
-                <li>Mohawk Unit 2 — Rent balance settled</li>
-                <li>Hamilton Water Billing resolved</li>
-            </ul>
-        </div>
 
         <!-- APPROVALS NEEDED -->
         <div class="category-section">
             <div class="section-header">
                 <span class="section-icon">🔶</span>
                 <span class="section-title">Approvals Needed</span>
-                <span class="section-count">6</span>
+                <span class="section-count" id="approval-count">0</span>
             </div>
             <div class="tasks-list">
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Grandfield Unit 1 — Follow up wall leak (vendor not patching). Owner asking if we can send someone local.</div>
-                        <div class="task-right">
-                            <span class="status-badge approval">Approval</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                    <div class="task-controls">
-                        <div class="btn-group">
-                            <button class="btn-control" onclick="setResponse(this, 'Approved')">Approved</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Hold')">Hold</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Rejected')">Rejected</button>
-                        </div>
-                        <div class="task-note"><input type="text" placeholder="Add note..." onchange="updateNote(this)"></div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">245 Mohawk Rd E — New leasing inquiry. Andrés (2BR $1,795). Income $5,000, credit 600-630.</div>
-                        <div class="task-right">
-                            <span class="status-badge approval">Approval</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                    <div class="task-controls">
-                        <div class="btn-group">
-                            <button class="btn-control" onclick="setResponse(this, 'Approved')">Approved</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Hold')">Hold</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Rejected')">Rejected</button>
-                        </div>
-                        <div class="task-note"><input type="text" placeholder="Add note..." onchange="updateNote(this)"></div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Ferndale Unit 2 — Lawn care complaint. Grass overdue (over a week). Omar is assigned vendor.</div>
-                        <div class="task-right">
-                            <span class="status-badge approval">Approval</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                    <div class="task-controls">
-                        <div class="btn-group">
-                            <button class="btn-control" onclick="setResponse(this, 'Approved')">Approved</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Hold')">Hold</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Rejected')">Rejected</button>
-                        </div>
-                        <div class="task-note"><input type="text" placeholder="Add note..." onchange="updateNote(this)"></div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Thayer Unit 2 — Electrician needed (outlet issue). Window confirmed, fan item may be resolved.</div>
-                        <div class="task-right">
-                            <span class="status-badge approval">Approval</span>
-                            <span class="task-meta"><span>👤 Maya</span></span>
-                        </div>
-                    </div>
-                    <div class="task-controls">
-                        <div class="btn-group">
-                            <button class="btn-control" onclick="setResponse(this, 'Approved')">Approved</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Hold')">Hold</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Rejected')">Rejected</button>
-                        </div>
-                        <div class="task-note"><input type="text" placeholder="Add note..." onchange="updateNote(this)"></div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Upper Wellington Unit 2 — Vent blocking decision. Johnny Martinez needs clarification.</div>
-                        <div class="task-right">
-                            <span class="status-badge approval">Approval</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                    <div class="task-controls">
-                        <div class="btn-group">
-                            <button class="btn-control" onclick="setResponse(this, 'Approved')">Approved</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Hold')">Hold</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Rejected')">Rejected</button>
-                        </div>
-                        <div class="task-note"><input type="text" placeholder="Add note..." onchange="updateNote(this)"></div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">4-130 Wellington St — Madison Greaves rent discount request. Create CMA for review.</div>
-                        <div class="task-right">
-                            <span class="status-badge approval">Approval</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                    <div class="task-controls">
-                        <div class="btn-group">
-                            <button class="btn-control" onclick="setResponse(this, 'Approved')">Approved</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Hold')">Hold</button>
-                            <button class="btn-control" onclick="setResponse(this, 'Rejected')">Rejected</button>
-                        </div>
-                        <div class="task-note"><input type="text" placeholder="Add note..." onchange="updateNote(this)"></div>
-                    </div>
-                </div>
+                <!-- OPS-LOG-APPROVALS-START -->
+                <!-- Updated [timestamp will be inserted here daily at 7 AM] -->
+                <!-- OPS-LOG-APPROVALS-END -->
             </div>
         </div>
 
@@ -893,138 +776,26 @@
             <div class="section-header">
                 <span class="section-icon">⚙️</span>
                 <span class="section-title">In Progress</span>
-                <span class="section-count">7</span>
+                <span class="section-count" id="inprogress-count">0</span>
             </div>
             <div class="tasks-list">
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">West 4th Unit 1 — Process Mike Herron invoice $60.71 (microwave)</div>
-                        <div class="task-right">
-                            <span class="status-badge inprogress">In Progress</span>
-                            <span class="task-meta"><span>👤 Maya</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Upper Wellington Unit ??? — Smoking issue email not sent. Prepare N5 notice if repeats.</div>
-                        <div class="task-right">
-                            <span class="status-badge inprogress">In Progress</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">TenantCloud Account Cleanup — Overdue accounts and utility billings</div>
-                        <div class="task-right">
-                            <span class="status-badge inprogress">In Progress</span>
-                            <span class="task-meta"><span>👤 Maya</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Fairleigh Unit 1 — Pest control scheduled? Confirm status.</div>
-                        <div class="task-right">
-                            <span class="status-badge inprogress">In Progress</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Ferndale Unit 1 — Pest control quote approved by owner?</div>
-                        <div class="task-right">
-                            <span class="status-badge inprogress">In Progress</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Wave Account — Vendor invoicing setup (URGENT)</div>
-                        <div class="task-right">
-                            <span class="status-badge inprogress">In Progress</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Utilities — Sheet updated. Review with Maya for tenant invoicing.</div>
-                        <div class="task-right">
-                            <span class="status-badge inprogress">In Progress</span>
-                            <span class="task-meta"><span>👤 Maya</span></span>
-                        </div>
-                    </div>
-                </div>
+                <!-- OPS-LOG-INPROGRESS-START -->
+                <!-- Updated [timestamp will be inserted here daily at 7 AM] -->
+                <!-- OPS-LOG-INPROGRESS-END -->
             </div>
         </div>
 
-        <!-- OPEN ITEMS -->
+        <!-- NEW ITEMS -->
         <div class="category-section">
             <div class="section-header">
                 <span class="section-icon">📋</span>
-                <span class="section-title">Open Items</span>
-                <span class="section-count">5</span>
+                <span class="section-title">New Items</span>
+                <span class="section-count" id="new-count">0</span>
             </div>
             <div class="tasks-list">
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Thayer Unit 1 — Mike Herron invoice $226.78 via TenantCloud</div>
-                        <div class="task-right">
-                            <span class="status-badge pending">Pending</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Mohawk Unit 2 — Mike Herron invoice $465.30</div>
-                        <div class="task-right">
-                            <span class="status-badge pending">Pending</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">San Fernando — Mike Herron invoice $1,651.11</div>
-                        <div class="task-right">
-                            <span class="status-badge pending">Pending</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">Scotia Bank — Notifications not helpful. How to access account?</div>
-                        <div class="task-right">
-                            <span class="status-badge pending">Pending</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-description">WIX — Upload vacant properties to website</div>
-                        <div class="task-right">
-                            <span class="status-badge pending">Pending</span>
-                            <span class="task-meta"><span>👤 Tricia</span></span>
-                        </div>
-                    </div>
-                </div>
+                <!-- OPS-LOG-NEW-START -->
+                <!-- Updated [timestamp will be inserted here daily at 7 AM] -->
+                <!-- OPS-LOG-NEW-END -->
             </div>
         </div>
     </div>
