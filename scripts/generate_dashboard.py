@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """
-TPS Daily Dashboard Generator - FINAL VERSION
+TPS Daily Dashboard Generator
 Reads Google Sheets Operations Log + Archive, generates fresh index.html
-Runs daily at 7 AM via GitHub Actions
+Runs daily at 7 AM EDT (11 AM UTC) via GitHub Actions
 
-Features:
-- Reads Operations Log (Date, Property, Task/Issue, Notes, Category, Priority, Assigned To, Status)
-- Filters by status: New, In Progress, Stuck, Needs Approval, Maya Needs Help
-- Generates status-specific buttons and controls
-- Intelligently summarizes Quick Wins from Archive (last 7 days)
-- Truncates notes with click-to-expand capability
-- Includes subtle priority badges
+Columns (A-I):
+  A: # (ID)
+  B: Date
+  C: Property
+  D: Task / Issue
+  E: Notes
+  F: Category
+  G: Priority
+  H: Assigned To
+  I: Status
 """
 
 import os
@@ -23,33 +26,16 @@ from google.oauth2.service_account import Credentials
 # Configuration
 SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID", "1PETs8uNdhJyLs0VibspKZk1Jts8hqQcaFcxKWneBiQ4")
 OPS_LOG_TAB = "Operations Log"
-ARCHIVE_TAB = "📦 Archive"
+ARCHIVE_TAB = "Archive"
 INDEX_HTML = "index.html"
 
-# Column indices (0-based) for Operations Log
-OPS_COLS = {
-    "date": 0,
-    "property": 1,
-    "task": 2,
-    "notes": 3,
-    "category": 4,
-    "priority": 5,
-    "assigned": 6,
-    "status": 7,
-}
-
-# Column indices for Archive
-ARC_COLS = {
-    "date": 0,
-    "property": 1,
-    "task": 2,
-    "notes": 3,
-    "category": 4,
-    "priority": 5,
-    "assigned": 6,
-    "status": 7,
-    "date_completed": 8,
-}
+# Status values (exact match from sheet)
+STATUS_NEEDS_APPROVAL = "Needs Approval"
+STATUS_MAYA_NEEDS_HELP = "Maya Needs Help"
+STATUS_NEW = "New"
+STATUS_IN_PROGRESS = "In Progress"
+STATUS_STUCK = "Stuck"
+STATUS_FYI_ONLY = "FYI Only"
 
 def authenticate():
     """Authenticate with Google Sheets API using service account."""
@@ -65,362 +51,185 @@ def authenticate():
     creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
     return gspread.authorize(creds)
 
-def safe_get(row, col, default=""):
-    """Safely get a column value from a row."""
-    try:
-        val = row[col] if col < len(row) else default
-        return str(val).strip() if val else default
-    except (IndexError, TypeError):
-        return default
-
 def html_escape(text):
     """Escape HTML special characters."""
-    return (text.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace('"', "&quot;"))
-
-def truncate_notes(notes, max_length=100):
-    """Truncate notes and return truncated + full versions."""
-    if len(notes) <= max_length:
-        return notes, notes
-    truncated = notes[:max_length].rsplit(' ', 1)[0] + "..."
-    return truncated, notes
-
-def extract_priority_class(priority):
-    """Extract priority level from priority string and return CSS class."""
-    priority_lower = priority.lower()
-    if "🔴" in priority or "high" in priority_lower:
-        return "priority-high"
-    elif "🟡" in priority or "medium" in priority_lower:
-        return "priority-medium"
-    elif "🟢" in priority or "low" in priority_lower:
-        return "priority-low"
-    return "priority-low"
-
-def get_priority_label(priority):
-    """Extract priority label from priority string."""
-    if "high" in priority.lower() or "🔴" in priority:
-        return "High"
-    elif "medium" in priority.lower() or "🟡" in priority:
-        return "Medium"
-    elif "low" in priority.lower() or "🟢" in priority:
-        return "Low"
-    return "Medium"
-
-def intelligently_summarize_win(property_addr, task, notes, assigned):
-    """
-    Intelligently summarize a completed item from Archive.
-    Extract key action words: Approved, Paid, Scheduled, Completed, Notified, Canceled
-    """
-    task_lower = task.lower()
-    notes_lower = notes.lower()
-
-    # Action indicators mapping
-    action_indicators = {
-        "approved": "Approved",
-        "paid": "Paid",
-        "processed": "Paid",
-        "scheduled": "Scheduled",
-        "completed": "Completed",
-        "notified": "Notified",
-        "canceled": "Canceled",
-        "cancelled": "Canceled",
-    }
-
-    # Find the action that applies
-    action = None
-    for key, label in action_indicators.items():
-        if key in notes_lower or key in task_lower:
-            action = label
-            break
-
-    # Build summary
-    summary = task.strip()
-
-    # Add property if not "General"
-    if property_addr and property_addr.lower() != "general":
-        summary = f"{property_addr} — {summary}"
-
-    # Add action if found
-    if action:
-        summary = f"{summary} — {action}"
-
-    return summary.strip()
+    if not text:
+        return ""
+    return (str(text).replace("&", "&amp;")
+                     .replace("<", "&lt;")
+                     .replace(">", "&gt;")
+                     .replace('"', "&quot;"))
 
 def fetch_operations_log(client):
-    """Read Operations Log sheet and return list of task dicts organized by status."""
+    """Read Operations Log sheet and return tasks grouped by status."""
     sheet = client.open_by_key(SPREADSHEET_ID)
     ws = sheet.worksheet(OPS_LOG_TAB)
-    rows = ws.get_all_values()
+    rows = ws.get_all_records()  # Returns list of dicts with headers as keys
 
+    # Initialize status categories
     tasks_by_status = {
-        "needs_approval": [],
-        "in_progress": [],
-        "new": [],
-        "stuck": [],
-        "maya_needs_help": []
+        STATUS_NEEDS_APPROVAL: [],
+        STATUS_MAYA_NEEDS_HELP: [],
+        STATUS_NEW: [],
+        STATUS_IN_PROGRESS: [],
+        STATUS_STUCK: [],
+        STATUS_FYI_ONLY: [],
     }
 
-    # Skip header rows (first 2 rows)
-    for row in rows[2:]:
-        if not any(row):
+    for row in rows:
+        # Skip empty rows
+        if not row.get("Task / Issue"):
             continue
 
-        property_addr = safe_get(row, OPS_COLS["property"])
-        task = safe_get(row, OPS_COLS["task"])
-        notes = safe_get(row, OPS_COLS["notes"])
-        assigned = safe_get(row, OPS_COLS["assigned"])
-        status = safe_get(row, OPS_COLS["status"])
-        priority = safe_get(row, OPS_COLS["priority"])
+        status = row.get("Status", "").strip()
+        if status not in tasks_by_status:
+            continue  # Skip items with unknown status
 
-        # Skip if empty task
-        if not task:
-            continue
-
-        # Truncate notes
-        notes_truncated, notes_full = truncate_notes(notes, 100)
-
-        task_obj = {
-            "property": property_addr,
-            "task": task,
-            "notes": notes,
-            "notes_truncated": notes_truncated,
-            "notes_full": notes_full,
-            "assigned": assigned,
-            "status": status.lower(),
-            "priority": priority,
-            "priority_class": extract_priority_class(priority),
-            "priority_label": get_priority_label(priority),
+        task_data = {
+            "property": row.get("Property", "").strip(),
+            "task": row.get("Task / Issue", "").strip(),
+            "notes": row.get("Notes", "").strip(),
+            "assigned": row.get("Assigned To", "").strip(),
+            "priority": row.get("Priority", "").strip(),
+            "category": row.get("Category", "").strip(),
+            "status": status,
         }
 
-        # Organize by status
-        status_lower = status.lower()
-        if "needs approval" in status_lower:
-            tasks_by_status["needs_approval"].append(task_obj)
-        elif "in progress" in status_lower:
-            tasks_by_status["in_progress"].append(task_obj)
-        elif "stuck" in status_lower:
-            tasks_by_status["stuck"].append(task_obj)
-        elif "maya needs help" in status_lower:
-            tasks_by_status["maya_needs_help"].append(task_obj)
-        elif "new" in status_lower:
-            tasks_by_status["new"].append(task_obj)
+        tasks_by_status[status].append(task_data)
 
     return tasks_by_status
 
-def fetch_archive(client, days=7):
-    """Read Archive sheet and return recently completed items with smart summaries."""
+def fetch_archive(client, limit=9):
+    """Read Archive sheet and return last N items (newest first)."""
     sheet = client.open_by_key(SPREADSHEET_ID)
-    try:
-        ws = sheet.worksheet(ARCHIVE_TAB)
-    except:
-        print("  WARNING: Archive sheet not found")
-        return []
+    ws = sheet.worksheet(ARCHIVE_TAB)
+    rows = ws.get_all_records()
 
-    rows = ws.get_all_values()
-    cutoff = datetime.now() - timedelta(days=days)
     items = []
-
-    for row in rows[2:]:  # Skip headers
-        if not any(row):
+    for row in reversed(rows):  # Reverse to get newest first
+        if not row.get("Task / Issue"):
             continue
 
-        task = safe_get(row, ARC_COLS["task"])
-        if not task:
-            continue
+        items.append({
+            "property": row.get("Property", "").strip(),
+            "task": row.get("Task / Issue", "").strip(),
+            "notes": row.get("Notes", "").strip(),
+            "assigned": row.get("Assigned To", "").strip(),
+            "priority": row.get("Priority", "").strip(),
+            "category": row.get("Category", "").strip(),
+        })
 
-        # Try to parse date completed (column K = index 10)
-        date_str = safe_get(row, 10) if len(row) > 10 else ""
-        item_date = None
-        for fmt in ("%m/%d/%Y", "%Y-%m-%d", "%d/%m/%Y"):
-            try:
-                item_date = datetime.strptime(date_str, fmt)
-                break
-            except ValueError:
-                continue
+        if len(items) >= limit:
+            break
 
-        # Include if within cutoff
-        if item_date and item_date >= cutoff:
-            property_addr = safe_get(row, ARC_COLS["property"])
-            notes = safe_get(row, ARC_COLS["notes"])
-            assigned = safe_get(row, ARC_COLS["assigned"])
+    return items
 
-            # Create smart summary
-            summary = intelligently_summarize_win(property_addr, task, notes, assigned)
+def build_task_item(task):
+    """Generate HTML for a task item in a section."""
+    property_val = html_escape(task.get("property", ""))
+    task_text = html_escape(task.get("task", ""))
+    assigned = html_escape(task.get("assigned", ""))
+    priority = html_escape(task.get("priority", ""))
 
-            items.append({
-                "property": property_addr,
-                "task": task,
-                "notes": notes,
-                "assigned": assigned,
-                "date": date_str,
-                "summary": summary,
-            })
+    # Build title
+    title = f"{task_text}"
+    if property_val:
+        title = f"[{property_val}] {task_text}"
 
-    # Sort by date, newest first
-    items.sort(key=lambda x: x.get("date", ""), reverse=True)
-    return items  # Return all items from last 7 days (no limit)
+    # Build metadata
+    meta = []
+    if priority:
+        meta.append(f"Priority: {priority}")
+    if assigned:
+        meta.append(f"Assigned: {assigned}")
+    meta_str = " | ".join(meta) if meta else ""
 
-def build_task_card(task, status_type):
-    """Generate HTML for a single task card based on status type."""
-    property_val = html_escape(task["property"])
-    task_desc = html_escape(task["task"])
-    notes_trunc = html_escape(task["notes_truncated"])
-    assigned = html_escape(task["assigned"])
-    priority_class = task["priority_class"]
-    priority_label = task["priority_label"]
+    html = f'            <div class="task-item">\n'
+    html += f'                <div class="task-title">{title}</div>\n'
+    if meta_str:
+        html += f'                <div class="task-meta">{meta_str}</div>\n'
+    html += f'            </div>\n'
 
-    # Build task-top section
-    task_top = (
-        f'        <div class="task-top">\n'
-        f'          <div class="task-left">\n'
-        f'            <div class="task-property">{property_val}</div>\n'
-        f'            <div class="task-description">{task_desc}</div>\n'
-        f'            <div class="task-notes"><span class="note-truncated">{notes_trunc}</span></div>\n'
-        f'          </div>\n'
-        f'          <div class="task-right">\n'
-        f'            <div class="task-meta">\n'
-        f'              <span class="priority-badge {priority_class}">{priority_label}</span>\n'
-    )
+    return html
 
-    # Status badge and assigned info varies by status
-    if status_type == "needs_approval":
-        task_top += f'              <span class="status-badge approval">Approval</span>\n'
-    elif status_type == "in_progress":
-        task_top += f'              <span class="status-badge inprogress">In Progress</span>\n'
-    elif status_type == "new":
-        task_top += f'              <span class="status-badge new">New</span>\n'
-    elif status_type == "stuck":
-        task_top += f'              <span class="status-badge stuck">Stuck</span>\n'
-    elif status_type == "maya_needs_help":
-        task_top += f'              <span class="status-badge help">Maya Needs Help</span>\n'
+def build_quick_wins(archive_items):
+    """Generate HTML for Quick Wins section from archive items."""
+    if not archive_items:
+        return '<p style="color: #999;">No recent completions</p>'
 
-    task_top += f'            </div>\n'
-
-    # Show assigned for In Progress and Needs Approval, but not for New
-    if status_type in ("in_progress", "needs_approval", "stuck", "maya_needs_help"):
-        task_top += f'            <span class="assigned">👤 {assigned}</span>\n'
-
-    task_top += f'          </div>\n        </div>\n'
-
-    # Build controls based on status
-    controls = ""
-    if status_type == "needs_approval":
-        controls = (
-            f'        <div class="task-controls">\n'
-            f'          <div class="btn-group">\n'
-            f'            <button>Approved</button>\n'
-            f'            <button>On Hold</button>\n'
-            f'            <button>Rejected</button>\n'
-            f'          </div>\n'
-            f'          <div class="task-note"><input type="text" placeholder="Add note..."></div>\n'
-            f'        </div>\n'
-        )
-    elif status_type == "in_progress":
-        controls = (
-            f'        <div class="task-controls">\n'
-            f'          <div class="btn-group">\n'
-            f'            <button>Done</button>\n'
-            f'          </div>\n'
-            f'          <div class="task-note"><input type="text" placeholder="Add note..."></div>\n'
-            f'        </div>\n'
-        )
-    elif status_type == "new":
-        controls = (
-            f'        <div class="task-controls">\n'
-            f'          <div class="btn-group">\n'
-            f'            <button>Maya on it</button>\n'
-            f'            <button>Tricia on it</button>\n'
-            f'            <button>Done</button>\n'
-            f'          </div>\n'
-            f'          <div class="task-note"><input type="text" placeholder="Add note..."></div>\n'
-            f'        </div>\n'
-        )
-    elif status_type in ("stuck", "maya_needs_help"):
-        controls = (
-            f'        <div class="task-controls">\n'
-            f'          <div class="task-note"><input type="text" placeholder="Add note..."></div>\n'
-            f'        </div>\n'
-        )
-
-    return (
-        f'        <div class="task-card">\n'
-        f'{task_top}'
-        f'{controls}'
-        f'        </div>'
-    )
-
-def build_wins_grid(archive_items):
-    """Generate grid items for Quick Wins section using smart summaries (3-column grid)."""
     items = []
     for item in archive_items:
-        summary = html_escape(item["summary"])
-        items.append(f'                <div class="wins-item">{summary}</div>')
+        property_val = html_escape(item.get("property", ""))
+        task_text = html_escape(item.get("task", ""))
+        assigned = html_escape(item.get("assigned", ""))
+
+        # Build label intelligently
+        label = task_text
+        if property_val and property_val.lower() not in ("general", "n/a", ""):
+            label = f"{property_val} — {task_text}"
+
+        if len(label) > 60:
+            label = label[:57] + "..."
+
+        if assigned:
+            label += f" ({assigned})"
+
+        items.append(f'            <div class="quick-win-item">{label}</div>')
+
     return '\n'.join(items)
 
-def inject_into_html(tasks_by_status, archive_items):
+def inject_into_html(ops_tasks_by_status, archive_items):
     """Inject generated content into index.html between markers."""
     with open(INDEX_HTML, "r", encoding="utf-8") as f:
         html = f.read()
 
-    now = datetime.now().strftime("%B %d, %Y at %I:%M %p EDT")
+    now = datetime.now().strftime("%B %d, %Y at %I:%M %p")
 
-    # Generate task cards by status
-    approvals_html = '\n'.join(build_task_card(t, "needs_approval") for t in tasks_by_status["needs_approval"])
-    inprogress_html = '\n'.join(build_task_card(t, "in_progress") for t in tasks_by_status["in_progress"])
-    new_html = '\n'.join(build_task_card(t, "new") for t in tasks_by_status["new"])
-    stuck_html = '\n'.join(build_task_card(t, "stuck") for t in tasks_by_status["stuck"])
-    help_html = '\n'.join(build_task_card(t, "maya_needs_help") for t in tasks_by_status["maya_needs_help"])
+    # Build HTML for each status category
+    sections = {
+        "NEEDS_APPROVAL": "".join(build_task_item(t) for t in ops_tasks_by_status[STATUS_NEEDS_APPROVAL]),
+        "MAYA_NEEDS_HELP": "".join(build_task_item(t) for t in ops_tasks_by_status[STATUS_MAYA_NEEDS_HELP]),
+        "NEW_ITEMS": "".join(build_task_item(t) for t in ops_tasks_by_status[STATUS_NEW]),
+        "IN_PROGRESS": "".join(build_task_item(t) for t in ops_tasks_by_status[STATUS_IN_PROGRESS]),
+        "QUICK_WINS": build_quick_wins(archive_items),
+    }
 
-    wins_html = build_wins_grid(archive_items)
+    # Inject each section
+    markers = {
+        "NEEDS_APPROVAL": ("<!-- NEEDS_APPROVAL_START -->", "<!-- NEEDS_APPROVAL_END -->"),
+        "MAYA_NEEDS_HELP": ("<!-- MAYA_NEEDS_HELP_START -->", "<!-- MAYA_NEEDS_HELP_END -->"),
+        "NEW_ITEMS": ("<!-- NEW_ITEMS_START -->", "<!-- NEW_ITEMS_END -->"),
+        "IN_PROGRESS": ("<!-- IN_PROGRESS_START -->", "<!-- IN_PROGRESS_END -->"),
+        "QUICK_WINS": ("<!-- QUICK_WINS_START -->", "<!-- QUICK_WINS_END -->"),
+    }
 
-    # Inject approvals
-    pattern = r'<!-- OPS-LOG-APPROVALS-START -->.*?<!-- OPS-LOG-APPROVALS-END -->'
-    block = f'<!-- OPS-LOG-APPROVALS-START -->\n                <!-- Updated {now} -->\n{approvals_html}\n                <!-- OPS-LOG-APPROVALS-END -->'
-    if re.search(pattern, html, re.DOTALL):
-        html = re.sub(pattern, block, html, flags=re.DOTALL)
-    else:
-        print("  WARNING: OPS-LOG-APPROVALS markers not found")
+    for section, (start_marker, end_marker) in markers.items():
+        pattern = re.escape(start_marker) + r'.*?' + re.escape(end_marker)
+        content = sections.get(section, "")
+        replacement = f"{start_marker}\n{content}\n            {end_marker}"
 
-    # Inject in progress
-    pattern = r'<!-- OPS-LOG-INPROGRESS-START -->.*?<!-- OPS-LOG-INPROGRESS-END -->'
-    block = f'<!-- OPS-LOG-INPROGRESS-START -->\n                <!-- Updated {now} -->\n{inprogress_html}\n                <!-- OPS-LOG-INPROGRESS-END -->'
-    if re.search(pattern, html, re.DOTALL):
-        html = re.sub(pattern, block, html, flags=re.DOTALL)
-    else:
-        print("  WARNING: OPS-LOG-INPROGRESS markers not found")
-
-    # Inject new items
-    pattern = r'<!-- OPS-LOG-NEW-START -->.*?<!-- OPS-LOG-NEW-END -->'
-    block = f'<!-- OPS-LOG-NEW-START -->\n                <!-- Updated {now} -->\n{new_html}\n                <!-- OPS-LOG-NEW-END -->'
-    if re.search(pattern, html, re.DOTALL):
-        html = re.sub(pattern, block, html, flags=re.DOTALL)
-    else:
-        print("  WARNING: OPS-LOG-NEW markers not found")
-
-    # Inject quick wins
-    pattern = r'<!-- ARCHIVE-START -->.*?<!-- ARCHIVE-END -->'
-    block = f'<!-- ARCHIVE-START -->\n                <!-- Updated {now} -->\n{wins_html}\n                <!-- ARCHIVE-END -->'
-    if re.search(pattern, html, re.DOTALL):
-        html = re.sub(pattern, block, html, flags=re.DOTALL)
-    else:
-        print("  WARNING: ARCHIVE markers not found")
-
-    # Update timestamp in page
-    pattern = r'(<p class="last-updated">)[^<]*(</p>)'
-    replacement = rf'\g<1>Closed items — {now}\g<2>'
-    html = re.sub(pattern, replacement, html)
+        if re.search(pattern, html, re.DOTALL):
+            html = re.sub(pattern, replacement, html, flags=re.DOTALL)
+        else:
+            print(f"  WARNING: {section} markers not found in HTML")
 
     # Write updated HTML
     with open(INDEX_HTML, "w", encoding="utf-8") as f:
         f.write(html)
 
-    total_tasks = sum(len(v) for v in tasks_by_status.values())
-    print(f"✓ Dashboard updated: {len(tasks_by_status['needs_approval'])} approvals, {len(tasks_by_status['in_progress'])} in progress, {len(tasks_by_status['new'])} new, {len(archive_items)} wins")
+    # Print summary
+    total_count = sum(len(tasks) for tasks in ops_tasks_by_status.values())
+    print(f"✓ Dashboard updated at {now}")
+    print(f"  Needs Approval: {len(ops_tasks_by_status[STATUS_NEEDS_APPROVAL])}")
+    print(f"  Maya Needs Help: {len(ops_tasks_by_status[STATUS_MAYA_NEEDS_HELP])}")
+    print(f"  New: {len(ops_tasks_by_status[STATUS_NEW])}")
+    print(f"  In Progress: {len(ops_tasks_by_status[STATUS_IN_PROGRESS])}")
+    print(f"  Stuck: {len(ops_tasks_by_status[STATUS_STUCK])}")
+    print(f"  FYI Only: {len(ops_tasks_by_status[STATUS_FYI_ONLY])}")
+    print(f"  Quick Wins: {len(archive_items)}")
 
 def main():
-    print("🔄 TPS Dashboard Generator (FINAL)")
+    print("🔄 TPS Dashboard Generator")
     print("=" * 50)
 
     try:
@@ -428,24 +237,24 @@ def main():
         client = authenticate()
 
         print("Reading Operations Log...")
-        ops = fetch_operations_log(client)
-        total_ops = sum(len(v) for v in ops.values())
-        print(f"  Found {total_ops} tasks")
+        ops_by_status = fetch_operations_log(client)
+        total_ops = sum(len(tasks) for tasks in ops_by_status.values())
+        print(f"  Found {total_ops} tasks across all statuses")
 
-        print("Reading Archive (last 7 days with smart summaries)...")
-        arc = fetch_archive(client, days=7)
-        print(f"  Found {len(arc)} recent completions")
-        for item in arc[:3]:
-            print(f"    → {item['summary']}")
+        print("Reading Archive...")
+        arc = fetch_archive(client, limit=9)
+        print(f"  Found {len(arc)} archived items")
 
         print("Generating HTML...")
-        inject_into_html(ops, arc)
+        inject_into_html(ops_by_status, arc)
 
         print("=" * 50)
-        print("✓ Done! Dashboard is fresh and ready.")
+        print("✓ Done! Dashboard is fresh.")
 
     except Exception as e:
         print(f"✗ Error: {e}")
+        import traceback
+        traceback.print_exc()
         raise
 
 if __name__ == "__main__":
