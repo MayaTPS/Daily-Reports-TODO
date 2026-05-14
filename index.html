@@ -595,8 +595,16 @@
             <div class="wins-title">Quick Wins (Closed Items)</div>
             <ul class="wins-list" id="quickWins">
                 <!-- QUICK_WINS_START -->
-                <li>Loading quick wins...</li>
-                <!-- QUICK_WINS_END -->
+                <li>Upper Wellington — Send notice about smoking issue within... (🔴 High)</li>
+                <li>Wave Account - Vendor Invoicing (🔴 High)</li>
+                <li>Britannia, Unit 1 — Water bill invoice correction - Candice (🟡 Medium)</li>
+                <li>245 Mohawk Rd E — New leasing inquiry - Andrés (2BR $1795) (🟡 Medium)</li>
+                <li>Process On Demand Handyman Invoice 111 (🔴 High)</li>
+                <li>Maya to set up an Interactive Dashboard (🔴 High)</li>
+                <li>Myrtle Ave — Tenant Utility Charge Back (🔴 High)</li>
+                <li>Tenant Utility Charge Back (🔴 High)</li>
+                <li>Mohawk — City of Hamilton has issued a Notice of Violation (🔴 High)</li>
+            <!-- QUICK_WINS_END -->
             </ul>
         </div>
         <!-- OPERATIONS & ADMIN SECTION -->
@@ -604,8 +612,135 @@
             <h2 class="category-title">Operations & Admin</h2>
             <div id="operations-admin-content">
                 <!-- OPERATIONS_ADMIN_START -->
-                <div class="empty-state">No items in this category</div>
-                <!-- OPERATIONS_ADMIN_END -->
+        <div class="status-subsection">
+            <h4 class="status-subheader status-stuck">● Stuck (1)</h4>
+            <div class="tasks-list">
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('operations & admin-stuck-0')">
+                <div class="task-info">
+                    <div class="task-location">General</div>
+                    <div class="task-title">Scotia Bank</div>
+                    <div class="task-description" id="desc-operations & admin-stuck-0">The notifications I am receiving are not helpful. How can I access it?</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-medium"></div>
+                    <div class="task-status-badge status-stuck">Stuck</div>
+                </div>
+            </div>
+            <div class="task-comment-section" id="comment-operations & admin-stuck-0">
+                <textarea class="task-comment-input" id="note-operations & admin-stuck-0" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('operations & admin-stuck-0')">Save Note</button>
+            </div>
+            </div>
+        </div>
+        <div class="status-subsection">
+            <h4 class="status-subheader status-maya-help">● Maya Needs Help (1)</h4>
+            <div class="tasks-list">
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('operations & admin-maya-needs-help-0')">
+                <div class="task-info">
+                    <div class="task-location">General</div>
+                    <div class="task-title">WIX - Uploading vacant properties</div>
+                    <div class="task-description" id="desc-operations & admin-maya-needs-help-0">Maya needs access</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-low"></div>
+                    <div class="task-status-badge status-maya-help">Maya Needs Help</div>
+                </div>
+            </div>
+            <div class="task-comment-section" id="comment-operations & admin-maya-needs-help-0">
+                <textarea class="task-comment-input" id="note-operations & admin-maya-needs-help-0" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('operations & admin-maya-needs-help-0')">Save Note</button>
+            </div>
+            </div>
+        </div>
+        <div class="status-subsection">
+            <h4 class="status-subheader status-in-progress">● In Progress (1)</h4>
+            <div class="tasks-list">
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('operations & admin-in-progress-0')">
+                <div class="task-info">
+                    <div class="task-location">General</div>
+                    <div class="task-title">TenantCloud Account Cleanup</div>
+                    <div class="task-description" id="desc-operations & admin-in-progress-0">Clean Up tenantcloud overdue accounts, utility billings, &amp; maintenance.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-high"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('operations & admin-in-progress-0', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-operations & admin-in-progress-0">
+                <textarea class="task-comment-input" id="note-operations & admin-in-progress-0" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('operations & admin-in-progress-0')">Save Note</button>
+            </div>
+            </div>
+        </div>
+        <div class="status-subsection">
+            <h4 class="status-subheader status-fyi">● FYI Only (3)</h4>
+            <div class="tasks-list">
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('operations & admin-fyi-only-0')">
+                <div class="task-info">
+                    <div class="task-location">Mohawk, Unit 3</div>
+                    <div class="task-title">Tenisha Edwards - $17 short on rent</div>
+                    <div class="task-description" id="desc-operations & admin-fyi-only-0">Tenisha messaged saying she was $17 short by accident, will add it to this month's rent payment.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-low"></div>
+                    <div class="task-status-badge status-fyi">FYI Only</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('operations & admin-fyi-only-0', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-operations & admin-fyi-only-0">
+                <textarea class="task-comment-input" id="note-operations & admin-fyi-only-0" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('operations & admin-fyi-only-0')">Save Note</button>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('operations & admin-fyi-only-1')">
+                <div class="task-info">
+                    <div class="task-location">Grandfield</div>
+                    <div class="task-title">New Hamilton water bill from owner Jon Donde</div>
+                    <div class="task-description" id="desc-operations & admin-fyi-only-1">Owner Jon Donde forwarded the new City of Hamilton water bill for Grandfield (replaces Alectra). Login details provided. Upload and bill tenants.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-medium"></div>
+                    <div class="task-status-badge status-fyi">FYI Only</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('operations & admin-fyi-only-1', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-operations & admin-fyi-only-1">
+                <textarea class="task-comment-input" id="note-operations & admin-fyi-only-1" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('operations & admin-fyi-only-1')">Save Note</button>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('operations & admin-fyi-only-2')">
+                <div class="task-info">
+                    <div class="task-location">Thayer</div>
+                    <div class="task-title">Eviction meeting Wed May 20 11am</div>
+                    <div class="task-description" id="desc-operations & admin-fyi-only-2">Tricia scheduled '#3 - Thayer Eviction' meeting May 20 11-11:30am EDT. Attendees: Maya, cbecker78@icloud.com, lm2tradingcorp@gmail.com. Prep needed.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-high"></div>
+                    <div class="task-status-badge status-fyi">FYI Only</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('operations & admin-fyi-only-2', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-operations & admin-fyi-only-2">
+                <textarea class="task-comment-input" id="note-operations & admin-fyi-only-2" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('operations & admin-fyi-only-2')">Save Note</button>
+            </div>
+            </div>
+        </div>
+            <!-- OPERATIONS_ADMIN_END -->
             </div>
         </div>
         <!-- LEASING & MARKETING SECTION -->
@@ -613,8 +748,7 @@
             <h2 class="category-title">Leasing & Marketing</h2>
             <div id="leasing-marketing-content">
                 <!-- LEASING_MARKETING_START -->
-                <div class="empty-state">No items in this category</div>
-                <!-- LEASING_MARKETING_END -->
+            <!-- LEASING_MARKETING_END -->
             </div>
         </div>
         <!-- MAINTENANCE & REPAIRS SECTION -->
@@ -622,8 +756,114 @@
             <h2 class="category-title">Maintenance & Repairs</h2>
             <div id="maintenance-repairs-content">
                 <!-- MAINTENANCE_REPAIRS_START -->
-                <div class="empty-state">No items in this category</div>
-                <!-- MAINTENANCE_REPAIRS_END -->
+        <div class="status-subsection">
+            <h4 class="status-subheader status-stuck">● Stuck (1)</h4>
+            <div class="tasks-list">
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('maintenance & repairs-stuck-0')">
+                <div class="task-info">
+                    <div class="task-location">Ferndale, Unit 2</div>
+                    <div class="task-title">Lawn care complaint - grass overdue for mowing</div>
+                    <div class="task-description" id="desc-maintenance & repairs-stuck-0">Tenant Caitlyn Jones (and roommate Austin) report lawn has not been cut in over a week. Omar is the assigned lawn care vendor per vendor matrix.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-low"></div>
+                    <div class="task-status-badge status-stuck">Stuck</div>
+                </div>
+            </div>
+            <div class="task-comment-section" id="comment-maintenance & repairs-stuck-0">
+                <textarea class="task-comment-input" id="note-maintenance & repairs-stuck-0" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('maintenance & repairs-stuck-0')">Save Note</button>
+            </div>
+            </div>
+        </div>
+        <div class="status-subsection">
+            <h4 class="status-subheader status-in-progress">● In Progress (3)</h4>
+            <div class="tasks-list">
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('maintenance & repairs-in-progress-0')">
+                <div class="task-info">
+                    <div class="task-location">Fairleigh, Unit 1</div>
+                    <div class="task-title">Pest Control</div>
+                    <div class="task-description" id="desc-maintenance & repairs-in-progress-0">Is this currently scheduled?</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-high"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('maintenance & repairs-in-progress-0', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-maintenance & repairs-in-progress-0">
+                <textarea class="task-comment-input" id="note-maintenance & repairs-in-progress-0" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('maintenance & repairs-in-progress-0')">Save Note</button>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('maintenance & repairs-in-progress-1')">
+                <div class="task-info">
+                    <div class="task-location">Ferndale, Unit 1</div>
+                    <div class="task-title">Pest Control</div>
+                    <div class="task-description" id="desc-maintenance & repairs-in-progress-1">Quote approved by the owner?</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-high"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('maintenance & repairs-in-progress-1', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-maintenance & repairs-in-progress-1">
+                <textarea class="task-comment-input" id="note-maintenance & repairs-in-progress-1" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('maintenance & repairs-in-progress-1')">Save Note</button>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('maintenance & repairs-in-progress-2')">
+                <div class="task-info">
+                    <div class="task-location">Grandfield Unit 1</div>
+                    <div class="task-title">Follow up wall leak - vendor not patching</div>
+                    <div class="task-description" id="desc-maintenance & repairs-in-progress-2">Owner is asking if we could send someone local.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-high"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('maintenance & repairs-in-progress-2', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-maintenance & repairs-in-progress-2">
+                <textarea class="task-comment-input" id="note-maintenance & repairs-in-progress-2" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('maintenance & repairs-in-progress-2')">Save Note</button>
+            </div>
+            </div>
+        </div>
+        <div class="status-subsection">
+            <h4 class="status-subheader status-fyi">● FYI Only (1)</h4>
+            <div class="tasks-list">
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('maintenance & repairs-fyi-only-0')">
+                <div class="task-info">
+                    <div class="task-location">West 4th, Unit 1</div>
+                    <div class="task-title">Lighting maintenance - stove light &amp; bulb replacement</div>
+                    <div class="task-description" id="desc-maintenance & repairs-fyi-only-0">Two related lighting maintenance requests at West 4th Unit 1: oven/stove light and interior bulb needs replaced. Mike Herron responded in thread asking Maya for info.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-low"></div>
+                    <div class="task-status-badge status-fyi">FYI Only</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('maintenance & repairs-fyi-only-0', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-maintenance & repairs-fyi-only-0">
+                <textarea class="task-comment-input" id="note-maintenance & repairs-fyi-only-0" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('maintenance & repairs-fyi-only-0')">Save Note</button>
+            </div>
+            </div>
+        </div>
+            <!-- MAINTENANCE_REPAIRS_END -->
             </div>
         </div>
         <!-- FINANCIALS & ACCOUNTING SECTION -->
@@ -631,8 +871,97 @@
             <h2 class="category-title">Financials & Accounting</h2>
             <div id="financials-accounting-content">
                 <!-- FINANCIALS_ACCOUNTING_START -->
-                <div class="empty-state">No items in this category</div>
-                <!-- FINANCIALS_ACCOUNTING_END -->
+        <div class="status-subsection">
+            <h4 class="status-subheader status-new">● New (2)</h4>
+            <div class="tasks-list">
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('financials & accounting-new-0')">
+                <div class="task-info">
+                    <div class="task-location">Mohawk, Unit 2</div>
+                    <div class="task-title">Mike Herron Invoice $465.30</div>
+                    <div class="task-description" id="desc-financials & accounting-new-0">Mike Manually messaged me about this invoice</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-medium"></div>
+                    <div class="task-status-badge status-new">New</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-primary" onclick="setResponse('financials & accounting-new-0', 'Tricia')">Tricia on it</button>
+                <button class="task-btn task-btn-primary" onclick="setResponse('financials & accounting-new-0', 'Maya')">Maya on it</button>
+                <button class="task-btn task-btn-success" onclick="setResponse('financials & accounting-new-0', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-financials & accounting-new-0">
+                <textarea class="task-comment-input" id="note-financials & accounting-new-0" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('financials & accounting-new-0')">Save Note</button>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('financials & accounting-new-1')">
+                <div class="task-info">
+                    <div class="task-location">San Frenando</div>
+                    <div class="task-title">Mike Herron Invoice $1651.11.</div>
+                    <div class="task-description" id="desc-financials & accounting-new-1">Mike Manually messaged me about this invoice</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-low"></div>
+                    <div class="task-status-badge status-new">New</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-primary" onclick="setResponse('financials & accounting-new-1', 'Tricia')">Tricia on it</button>
+                <button class="task-btn task-btn-primary" onclick="setResponse('financials & accounting-new-1', 'Maya')">Maya on it</button>
+                <button class="task-btn task-btn-success" onclick="setResponse('financials & accounting-new-1', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-financials & accounting-new-1">
+                <textarea class="task-comment-input" id="note-financials & accounting-new-1" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('financials & accounting-new-1')">Save Note</button>
+            </div>
+            </div>
+        </div>
+        <div class="status-subsection">
+            <h4 class="status-subheader status-in-progress">● In Progress (2)</h4>
+            <div class="tasks-list">
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('financials & accounting-in-progress-0')">
+                <div class="task-info">
+                    <div class="task-location">West 4th, Unit 1</div>
+                    <div class="task-title">Process Mike Herron invoice - $60.71</div>
+                    <div class="task-description" id="desc-financials & accounting-in-progress-0">Microwave. Needs review and payment.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-medium"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('financials & accounting-in-progress-0', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-financials & accounting-in-progress-0">
+                <textarea class="task-comment-input" id="note-financials & accounting-in-progress-0" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('financials & accounting-in-progress-0')">Save Note</button>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('financials & accounting-in-progress-1')">
+                <div class="task-info">
+                    <div class="task-location">Thayer Unit 1</div>
+                    <div class="task-title">Mike Herron invoice 226.78 via TenantCloud</div>
+                    <div class="task-description" id="desc-financials & accounting-in-progress-1">Needs review and payment.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-medium"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('financials & accounting-in-progress-1', 'Done')">Done</button>
+            </div>
+            <div class="task-comment-section" id="comment-financials & accounting-in-progress-1">
+                <textarea class="task-comment-input" id="note-financials & accounting-in-progress-1" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('financials & accounting-in-progress-1')">Save Note</button>
+            </div>
+            </div>
+        </div>
+            <!-- FINANCIALS_ACCOUNTING_END -->
             </div>
         </div>
         <!-- TENANT RELATIONS SECTION -->
@@ -640,8 +969,7 @@
             <h2 class="category-title">Tenant Relations</h2>
             <div id="tenant-relations-content">
                 <!-- TENANT_RELATIONS_START -->
-                <div class="empty-state">No items in this category</div>
-                <!-- TENANT_RELATIONS_END -->
+            <!-- TENANT_RELATIONS_END -->
             </div>
         </div>
     </div>
