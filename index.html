@@ -660,32 +660,226 @@
             <div class="wins-title">🎯 Closed Items </div>
             <ul class="wins-list" id="quickWins">
                 <!-- QUICK_WINS_START -->
-                <li>Loading quick wins...</li>
-                <!-- QUICK_WINS_END -->
+                <li>Upper Wellington — Send notice about smoking issue within... (🔴 High)</li>
+                <li>Wave Account - Vendor Invoicing (🔴 High)</li>
+                <li>Britannia, Unit 1 — Water bill invoice correction - Candice (🟡 Medium)</li>
+                <li>245 Mohawk Rd E — New leasing inquiry - Andrés (2BR $1795) (🟡 Medium)</li>
+                <li>Process On Demand Handyman Invoice 111 (🔴 High)</li>
+                <li>Maya to set up an Interactive Dashboard (🔴 High)</li>
+                <li>Myrtle Ave — Tenant Utility Charge Back (🔴 High)</li>
+                <li>Tenant Utility Charge Back (🔴 High)</li>
+                <li>Mohawk — City of Hamilton has issued a Notice of Violation (🔴 High)</li>
+            <!-- QUICK_WINS_END -->
             </ul>
         </div>
         <!-- NEEDS APPROVAL SECTION -->
         <div class="section-title">✅ Needs Approval</div>
         <div class="tasks-list" id="needsApproval">
             <!-- NEEDS_APPROVAL_START -->
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('approval-0')">
+                <div class="task-info">
+                    <div class="task-location">Myrtle Ave, Unit 101</div>
+                    <div class="task-title">Bedroom windows screens request</div>
+                    <div class="task-description" id="desc-approval-0">Should we proceed (Y/N)? Who to send.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-low"></div>
+                    <div class="task-status-badge status-approval">Needs Approval</div>
+                </div>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('approval-1')">
+                <div class="task-info">
+                    <div class="task-location">4-130 Wellington St</div>
+                    <div class="task-title">Madison Greaves - Rent Discount Request</div>
+                    <div class="task-description" id="desc-approval-1">Create CMA and send to landlord for review</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-medium"></div>
+                    <div class="task-status-badge status-approval">Needs Approval</div>
+                </div>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('approval-2')">
+                <div class="task-info">
+                    <div class="task-location">Thayer, Unit 2</div>
+                    <div class="task-title">Electrician needed - outlet issue</div>
+                    <div class="task-description" id="desc-approval-2">Mike Herron confirmed electrical outlet issue not ceiling fan. Maya confirmed bathroom window exists so item 18 (fan) may be resolved.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-high"></div>
+                    <div class="task-status-badge status-approval">Needs Approval</div>
+                </div>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('approval-3')">
+                <div class="task-info">
+                    <div class="task-location">Upper Wellington, Unit 2</div>
+                    <div class="task-title">Vent blocking decision needed - Johnny</div>
+                    <div class="task-description" id="desc-approval-3">Johnny Martinez unsure if he can block vents at Upper Wellington Unit 2. Decision needed.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-medium"></div>
+                    <div class="task-status-badge status-approval">Needs Approval</div>
+                </div>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('approval-4')">
+                <div class="task-info">
+                    <div class="task-location">130 Wellington</div>
+                    <div class="task-title">Fire inspection schedule - The building doesn't have a fire safety plan</div>
+                    <div class="task-description" id="desc-approval-4">Company Name: HP Consulting
+Contacts: +1-289-547-1708 or +1-647-947-3348
+Email: vp.hpconsulting@gmail.com</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-medium"></div>
+                    <div class="task-status-badge status-approval">Needs Approval</div>
+                </div>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('approval-5')">
+                <div class="task-info">
+                    <div class="task-location">Ferndale, Unit 1</div>
+                    <div class="task-title">Remove leaking pipe - water damage/mould risk</div>
+                    <div class="task-description" id="desc-approval-5">Tenant Angela Godden reports pipe is dripping, has a bucket under it. Requests removal as it's unnecessary and risks mould.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-high"></div>
+                    <div class="task-status-badge status-approval">Needs Approval</div>
+                </div>
+            </div>
+
             <!-- NEEDS_APPROVAL_END -->
         </div>
         <!-- MAYA NEEDS HELP SECTION -->
         <div class="section-title">🆘 Maya Needs Help</div>
         <div class="tasks-list" id="mayaNeedsHelp">
             <!-- MAYA_NEEDS_HELP_START -->
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('maya-0')">
+                <div class="task-info">
+                    <div class="task-location">General</div>
+                    <div class="task-title">WIX - Uploading vacant properties</div>
+                    <div class="task-description" id="desc-maya-0">Maya needs access</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-low"></div>
+                    <div class="task-status-badge status-maya-help">Maya Needs Help</div>
+                </div>
+            </div>
+
             <!-- MAYA_NEEDS_HELP_END -->
         </div>
         <!-- NEW ITEMS SECTION -->
         <div class="section-title">🆕 New Items</div>
         <div class="tasks-list" id="newItems">
             <!-- NEW_ITEMS_START -->
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('new-0')">
+                <div class="task-info">
+                    <div class="task-location">Mohawk, Unit 2</div>
+                    <div class="task-title">Mike Herron Invoice $465.30</div>
+                    <div class="task-description" id="desc-new-0">Mike Manually messaged me about this invoice</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-medium"></div>
+                    <div class="task-status-badge status-new">New</div>
+                </div>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('new-1')">
+                <div class="task-info">
+                    <div class="task-location">San Frenando</div>
+                    <div class="task-title">Mike Herron Invoice $1651.11.</div>
+                    <div class="task-description" id="desc-new-1">Mike Manually messaged me about this invoice</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-low"></div>
+                    <div class="task-status-badge status-new">New</div>
+                </div>
+            </div>
+
             <!-- NEW_ITEMS_END -->
         </div>
         <!-- IN PROGRESS SECTION -->
         <div class="section-title">⏳ In Progress</div>
         <div class="tasks-list" id="inProgress">
             <!-- IN_PROGRESS_START -->
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('progress-0')">
+                <div class="task-info">
+                    <div class="task-location">Fairleigh, Unit 1</div>
+                    <div class="task-title">Pest Control</div>
+                    <div class="task-description" id="desc-progress-0">Is this currently scheduled?</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-high"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('progress-1')">
+                <div class="task-info">
+                    <div class="task-location">Ferndale, Unit 1</div>
+                    <div class="task-title">Pest Control</div>
+                    <div class="task-description" id="desc-progress-1">Quote approved by the owner?</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-high"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('progress-2')">
+                <div class="task-info">
+                    <div class="task-location">General</div>
+                    <div class="task-title">TenantCloud Account Cleanup</div>
+                    <div class="task-description" id="desc-progress-2">Clean Up tenantcloud overdue accounts, utility billings, &amp; maintenance.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-high"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('progress-3')">
+                <div class="task-info">
+                    <div class="task-location">West 4th, Unit 1</div>
+                    <div class="task-title">Process Mike Herron invoice - $60.71</div>
+                    <div class="task-description" id="desc-progress-3">Microwave. Needs review and payment.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-medium"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('progress-4')">
+                <div class="task-info">
+                    <div class="task-location">Grandfield Unit 1</div>
+                    <div class="task-title">Follow up wall leak - vendor not patching</div>
+                    <div class="task-description" id="desc-progress-4">Owner is asking if we could send someone local.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-high"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+            <div class="task-card">
+                <input type="checkbox" class="task-checkbox" onchange="toggleDescription('progress-5')">
+                <div class="task-info">
+                    <div class="task-location">Thayer Unit 1</div>
+                    <div class="task-title">Mike Herron invoice 226.78 via TenantCloud</div>
+                    <div class="task-description" id="desc-progress-5">Needs review and payment.</div>
+                </div>
+                <div class="task-right">
+                    <div class="priority-dot priority-medium"></div>
+                    <div class="task-status-badge status-in-progress">In Progress</div>
+                </div>
+            </div>
+
             <!-- IN_PROGRESS_END -->
         </div>
     </div>
