@@ -20,6 +20,7 @@ import os
 import json
 import re
 from datetime import datetime, timedelta
+from collections import defaultdict
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -28,6 +29,10 @@ SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID", "1PETs8uNdhJyLs0VibspKZk1Jts8h
 OPS_LOG_TAB = "Operations Log"
 ARCHIVE_TAB = "📦 Archive"
 INDEX_HTML = "index.html"
+
+# Category and status order
+CATEGORY_ORDER = ["Admin", "Maintenance", "Financial", "Inspection", "Legal", "Leasing", "Tenant Request", "General"]
+STATUS_ORDER = ["Stuck", "Maya Needs Help", "New", "In Progress", "FYI Only"]
 
 # Status values (exact match from sheet)
 STATUS_NEEDS_APPROVAL = "Needs Approval"
@@ -61,7 +66,7 @@ def html_escape(text):
                      .replace('"', "&quot;"))
 
 def fetch_operations_log(client):
-    """Read Operations Log sheet and return tasks grouped by status."""
+    """Read Operations Log sheet and return tasks grouped by category and status."""
     sheet = client.open_by_key(SPREADSHEET_ID)
     ws = sheet.worksheet(OPS_LOG_TAB)
 
@@ -79,24 +84,10 @@ def fetch_operations_log(client):
 
     if not headers:
         print("  WARNING: Could not find header row with 'Task / Issue'")
-        return {
-            STATUS_NEEDS_APPROVAL: [],
-            STATUS_MAYA_NEEDS_HELP: [],
-            STATUS_NEW: [],
-            STATUS_IN_PROGRESS: [],
-            STATUS_STUCK: [],
-            STATUS_FYI_ONLY: [],
-        }
+        return defaultdict(lambda: defaultdict(list))
 
-    # Initialize status categories
-    tasks_by_status = {
-        STATUS_NEEDS_APPROVAL: [],
-        STATUS_MAYA_NEEDS_HELP: [],
-        STATUS_NEW: [],
-        STATUS_IN_PROGRESS: [],
-        STATUS_STUCK: [],
-        STATUS_FYI_ONLY: [],
-    }
+    # Initialize nested structure: {category: {status: [tasks]}}
+    tasks_by_category_status = defaultdict(lambda: defaultdict(list))
 
     # Process data rows (skip header and everything before it)
     for row in all_values[header_idx + 1:]:
@@ -114,8 +105,13 @@ def fetch_operations_log(client):
             continue
 
         status = row_dict.get("Status", "").strip()
-        if status not in tasks_by_status:
-            continue  # Skip items with unknown status
+        category = row_dict.get("Category", "").strip() or "General"
+
+        # Skip if invalid status
+        valid_statuses = [STATUS_NEEDS_APPROVAL, STATUS_MAYA_NEEDS_HELP, STATUS_NEW,
+                         STATUS_IN_PROGRESS, STATUS_STUCK, STATUS_FYI_ONLY]
+        if status not in valid_statuses:
+            continue
 
         task_data = {
             "property": row_dict.get("Property", "").strip(),
@@ -123,16 +119,16 @@ def fetch_operations_log(client):
             "notes": row_dict.get("Notes", "").strip(),
             "assigned": row_dict.get("Assigned To", "").strip(),
             "priority": row_dict.get("Priority", "").strip(),
-            "category": row_dict.get("Category", "").strip(),
+            "category": category,
             "status": status,
         }
 
-        tasks_by_status[status].append(task_data)
+        tasks_by_category_status[category][status].append(task_data)
 
-    return tasks_by_status
+    return tasks_by_category_status
 
 def fetch_archive(client, limit=9):
-    """Read 📦 Archive sheet and return last N items (newest first)."""
+    """Read Archive sheet and return last N items (newest first)."""
     sheet = client.open_by_key(SPREADSHEET_ID)
     ws = sheet.worksheet(ARCHIVE_TAB)
 
@@ -149,7 +145,7 @@ def fetch_archive(client, limit=9):
             break
 
     if not headers:
-        print("  WARNING: Could not find header row in 📦 Archive sheet")
+        print("  WARNING: Could not find header row in Archive sheet")
         return []
 
     items = []
@@ -183,11 +179,10 @@ def fetch_archive(client, limit=9):
     return items
 
 def build_task_item(task, item_id=None):
-    """Generate HTML for a task item in a section (new dashboard format)."""
+    """Generate HTML for a task item in a section."""
     property_val = html_escape(task.get("property", ""))
     task_text = html_escape(task.get("task", ""))
     notes_text = html_escape(task.get("notes", ""))
-    assigned = html_escape(task.get("assigned", ""))
     priority = html_escape(task.get("priority", ""))
     status = task.get("status", "")
 
@@ -195,7 +190,7 @@ def build_task_item(task, item_id=None):
     if not item_id:
         item_id = f"task-{task_text[:10].replace(' ', '-')}"
 
-    # Build priority class (map to High/Medium/Low)
+    # Build priority class
     priority_class = "medium"
     if priority:
         priority_clean = priority.lower()
@@ -232,7 +227,40 @@ def build_task_item(task, item_id=None):
     html += f'                </div>\n'
     html += f'            </div>\n'
 
-    return html
+    # Build buttons and comment section based on status
+    buttons_html = ""
+    if status == "Stuck" or status == "Maya Needs Help":
+        # No buttons for these statuses
+        buttons_html = ""
+    elif status == "New":
+        # Three buttons: Tricia on it, Maya on it, Done
+        buttons_html = f'''            <div class="task-controls">
+                <button class="task-btn task-btn-primary" onclick="setResponse('{item_id}', 'Tricia')">Tricia on it</button>
+                <button class="task-btn task-btn-primary" onclick="setResponse('{item_id}', 'Maya')">Maya on it</button>
+                <button class="task-btn task-btn-success" onclick="setResponse('{item_id}', 'Done')">Done</button>
+            </div>
+'''
+    elif status == "In Progress":
+        # One button: Done
+        buttons_html = f'''            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('{item_id}', 'Done')">Done</button>
+            </div>
+'''
+    elif status == "FYI Only":
+        # One button: Done
+        buttons_html = f'''            <div class="task-controls">
+                <button class="task-btn task-btn-success" onclick="setResponse('{item_id}', 'Done')">Done</button>
+            </div>
+'''
+
+    # Comment/note section (always present)
+    comment_html = f'''            <div class="task-comment-section" id="comment-{item_id}">
+                <textarea class="task-comment-input" id="note-{item_id}" placeholder="Add a note or comment..." rows="2"></textarea>
+                <button class="task-btn task-btn-small" onclick="updateNote('{item_id}')">Save Note</button>
+            </div>
+'''
+
+    return html + buttons_html + comment_html
 
 def build_quick_wins(archive_items):
     """Generate HTML for Quick Wins section from archive items."""
@@ -260,61 +288,113 @@ def build_quick_wins(archive_items):
 
     return '\n'.join(items)
 
-def inject_into_html(ops_tasks_by_status, archive_items):
+def inject_into_html(tasks_by_category_status, archive_items):
     """Inject generated content into index.html between markers."""
     with open(INDEX_HTML, "r", encoding="utf-8") as f:
         html = f.read()
 
     now = datetime.now().strftime("%B %d, %Y at %I:%M %p")
 
-    # Build HTML for each status category
-    def build_section(tasks, status_name):
-        html = ""
-        for idx, task in enumerate(tasks):
-            item_id = f"{status_name.lower()}-{idx}"
-            html += build_task_item(task, item_id)
-        return html
+    # Build HTML sections organized by category and status
+    category_sections = {}
 
-    sections = {
-        "NEEDS_APPROVAL": build_section(ops_tasks_by_status[STATUS_NEEDS_APPROVAL], "approval"),
-        "MAYA_NEEDS_HELP": build_section(ops_tasks_by_status[STATUS_MAYA_NEEDS_HELP], "maya"),
-        "NEW_ITEMS": build_section(ops_tasks_by_status[STATUS_NEW], "new"),
-        "IN_PROGRESS": build_section(ops_tasks_by_status[STATUS_IN_PROGRESS], "progress"),
-        "QUICK_WINS": build_quick_wins(archive_items),
-    }
+    for category in CATEGORY_ORDER:
+        if category not in tasks_by_category_status:
+            category_sections[category] = ""
+            continue
+
+        category_html = ""
+        for status in STATUS_ORDER:
+            tasks = tasks_by_category_status[category].get(status, [])
+            if not tasks:
+                continue
+
+            # Build status subsection
+            status_class_map = {
+                "Stuck": "status-stuck",
+                "Maya Needs Help": "status-maya-help",
+                "New": "status-new",
+                "In Progress": "status-in-progress",
+                "FYI Only": "status-fyi",
+            }
+            status_class = status_class_map.get(status, "status-fyi")
+
+            category_html += f'        <div class="status-subsection">\n'
+            category_html += f'            <h4 class="status-subheader {status_class}">● {status} ({len(tasks)})</h4>\n'
+            category_html += f'            <div class="tasks-list">\n'
+
+            for idx, task in enumerate(tasks):
+                item_id = f"{category.lower()}-{status.lower().replace(' ', '-')}-{idx}"
+                category_html += build_task_item(task, item_id)
+
+            category_html += f'            </div>\n'
+            category_html += f'        </div>\n'
+
+        category_sections[category] = category_html
+
+    # Build Quick Wins
+    quick_wins_html = build_quick_wins(archive_items)
 
     # Inject each section
     markers = {
-        "NEEDS_APPROVAL": ("<!-- NEEDS_APPROVAL_START -->", "<!-- NEEDS_APPROVAL_END -->"),
-        "MAYA_NEEDS_HELP": ("<!-- MAYA_NEEDS_HELP_START -->", "<!-- MAYA_NEEDS_HELP_END -->"),
-        "NEW_ITEMS": ("<!-- NEW_ITEMS_START -->", "<!-- NEW_ITEMS_END -->"),
-        "IN_PROGRESS": ("<!-- IN_PROGRESS_START -->", "<!-- IN_PROGRESS_END -->"),
         "QUICK_WINS": ("<!-- QUICK_WINS_START -->", "<!-- QUICK_WINS_END -->"),
+        "ADMIN": ("<!-- ADMIN_START -->", "<!-- ADMIN_END -->"),
+        "MAINTENANCE": ("<!-- MAINTENANCE_START -->", "<!-- MAINTENANCE_END -->"),
+        "FINANCIAL": ("<!-- FINANCIAL_START -->", "<!-- FINANCIAL_END -->"),
+        "INSPECTION": ("<!-- INSPECTION_START -->", "<!-- INSPECTION_END -->"),
+        "LEGAL": ("<!-- LEGAL_START -->", "<!-- LEGAL_END -->"),
+        "LEASING": ("<!-- LEASING_START -->", "<!-- LEASING_END -->"),
+        "TENANT_REQUEST": ("<!-- TENANT_REQUEST_START -->", "<!-- TENANT_REQUEST_END -->"),
+        "GENERAL": ("<!-- GENERAL_START -->", "<!-- GENERAL_END -->"),
     }
 
-    for section, (start_marker, end_marker) in markers.items():
+    # Map category names to marker keys
+    category_markers = {
+        "Admin": "ADMIN",
+        "Maintenance": "MAINTENANCE",
+        "Financial": "FINANCIAL",
+        "Inspection": "INSPECTION",
+        "Legal": "LEGAL",
+        "Leasing": "LEASING",
+        "Tenant Request": "TENANT_REQUEST",
+        "General": "GENERAL",
+    }
+
+    for category, marker_key in category_markers.items():
+        start_marker, end_marker = markers[marker_key]
         pattern = re.escape(start_marker) + r'.*?' + re.escape(end_marker)
-        content = sections.get(section, "")
-        replacement = f"{start_marker}\n{content}\n            {end_marker}"
+        content = category_sections.get(category, "")
+        replacement = f"{start_marker}\n{content}            {end_marker}"
 
         if re.search(pattern, html, re.DOTALL):
             html = re.sub(pattern, replacement, html, flags=re.DOTALL)
         else:
-            print(f"  WARNING: {section} markers not found in HTML")
+            print(f"  WARNING: {marker_key} markers not found in HTML")
+
+    # Inject Quick Wins
+    start_marker, end_marker = markers["QUICK_WINS"]
+    pattern = re.escape(start_marker) + r'.*?' + re.escape(end_marker)
+    replacement = f"{start_marker}\n{quick_wins_html}\n            {end_marker}"
+
+    if re.search(pattern, html, re.DOTALL):
+        html = re.sub(pattern, replacement, html, flags=re.DOTALL)
 
     # Write updated HTML
     with open(INDEX_HTML, "w", encoding="utf-8") as f:
         f.write(html)
 
     # Print summary
-    total_count = sum(len(tasks) for tasks in ops_tasks_by_status.values())
+    total_count = sum(sum(len(tasks) for tasks in statuses.values())
+                     for statuses in tasks_by_category_status.values())
     print(f"✓ Dashboard updated at {now}")
-    print(f"  Needs Approval: {len(ops_tasks_by_status[STATUS_NEEDS_APPROVAL])}")
-    print(f"  Maya Needs Help: {len(ops_tasks_by_status[STATUS_MAYA_NEEDS_HELP])}")
-    print(f"  New: {len(ops_tasks_by_status[STATUS_NEW])}")
-    print(f"  In Progress: {len(ops_tasks_by_status[STATUS_IN_PROGRESS])}")
-    print(f"  Stuck: {len(ops_tasks_by_status[STATUS_STUCK])}")
-    print(f"  FYI Only: {len(ops_tasks_by_status[STATUS_FYI_ONLY])}")
+    for category in CATEGORY_ORDER:
+        if category in tasks_by_category_status:
+            cat_total = sum(len(tasks) for tasks in tasks_by_category_status[category].values())
+            print(f"  {category}: {cat_total} tasks")
+            for status in STATUS_ORDER:
+                count = len(tasks_by_category_status[category].get(status, []))
+                if count > 0:
+                    print(f"    - {status}: {count}")
     print(f"  Quick Wins: {len(archive_items)}")
 
 def main():
@@ -326,16 +406,17 @@ def main():
         client = authenticate()
 
         print("Reading Operations Log...")
-        ops_by_status = fetch_operations_log(client)
-        total_ops = sum(len(tasks) for tasks in ops_by_status.values())
-        print(f"  Found {total_ops} tasks across all statuses")
+        ops_by_cat_status = fetch_operations_log(client)
+        total_ops = sum(sum(len(tasks) for tasks in statuses.values())
+                       for statuses in ops_by_cat_status.values())
+        print(f"  Found {total_ops} tasks across all categories")
 
         print("Reading 📦 Archive...")
         arc = fetch_archive(client, limit=9)
         print(f"  Found {len(arc)} archived items")
 
         print("Generating HTML...")
-        inject_into_html(ops_by_status, arc)
+        inject_into_html(ops_by_cat_status, arc)
 
         print("=" * 50)
         print("✓ Done! Dashboard is fresh.")
