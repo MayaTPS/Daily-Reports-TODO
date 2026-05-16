@@ -123,9 +123,13 @@
       toast("Couldn't log — missing task ID", false);
       return Promise.reject(new Error("missing data-id"));
     }
+    const property = (taskItem.querySelector(".task-property")?.textContent || "").trim();
+    const taskTitle = (taskItem.querySelector(".task-title")?.textContent || "").trim();
     const actor = getActor();
     return postUpdate({
       id: id,
+            property: property,
+            task: taskTitle,
       status: status,
       note: note || "",
       by: actor
