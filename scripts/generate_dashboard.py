@@ -345,9 +345,14 @@ def build_quick_wins(archive_items):
         return '<div class="empty-state">No recent completions</div>'
     out = []
     for it in archive_items:
-        text = html_escape(it.get("task", ""))
-        if len(text) > 75:
-            text = text[:72] + "..."
+        task_text = (it.get("task", "") or "").strip()
+        notes_text = (it.get("notes", "") or "").strip()
+        if notes_text and notes_text.lower() not in ("done", "completed", "paid", "sent"):
+            text = html_escape(task_text + " — " + notes_text)
+        else:
+            text = html_escape(task_text)
+        if len(text) > 110:
+            text = text[:107] + "..."
         out.append(
             '<div class="win-item">\n'
             '    <div class="win-check">✓</div>\n'
