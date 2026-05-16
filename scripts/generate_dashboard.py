@@ -129,16 +129,16 @@ def row_to_dict(headers, row):
     return {h: (row[i] if i < len(row) else "") for i, h in enumerate(headers)}
 
 
-def get_task_id(row_dict, header_row_idx, row_idx, prefix="ops"):
+def get_task_id(row_dict, header_row_idx, row_idx, prefix=""):
     """
     Produce a stable task ID using the spreadsheet's '#' or 'ID' column when
     available, else a deterministic fallback derived from the row position.
     """
     for key in ("#", "ID", "Id", "id"):
         if key in row_dict and str(row_dict[key]).strip():
-            return f"{prefix}-{str(row_dict[key]).strip()}"
+            return str(row_dict[key]).strip()
     # Fallback: sheet row number (1-indexed in spreadsheet; +1 for header row)
-    return f"{prefix}-row{header_row_idx + row_idx + 2}"
+    return f"row-{header_row_idx + row_idx + 2}"
 
 
 # ---------------------------------------------------------------------------
@@ -169,7 +169,7 @@ def fetch_operations_log(client):
         category = rd.get("Category", "").strip() or "General"
 
         grouped[category][status].append({
-            "id":       get_task_id(rd, header_idx, offset, prefix="ops"),
+            "id":       get_task_id(rd, header_idx, offset, prefix=""),
             "property": rd.get("Property", "").strip(),
             "task":     task,
             "notes":    rd.get("Notes", "").strip(),
