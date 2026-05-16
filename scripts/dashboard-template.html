@@ -950,6 +950,14 @@
                 align-items: flex-start;
             }
         }
+        @media (max-width: 768px) {
+            .task-title, .task-description, .task-property, .win-item-text { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; word-break: break-word; overflow-wrap: anywhere; line-height: 1.4; }
+            .task-status-badge { white-space: normal; }
+            .task-buttons { flex-wrap: wrap; }
+            .quick-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .container { padding: 14px; max-width: 100%; overflow-x: hidden; }
+            .task-info { min-width: 0; width: 100%; }
+        }
     </style>
 </head>
 <body>
