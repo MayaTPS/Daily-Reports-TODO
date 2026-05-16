@@ -1,0 +1,43 @@
+name: Daily Dashboard Update
+
+# Runs at 1:00 PM Eastern, every day.
+# Eastern Daylight Time (EDT, summer): 17:00 UTC
+# Eastern Standard Time (EST, winter): 18:00 UTC
+# Cron below covers EDT (mid-Mar to early Nov). For EST, change "0 17" -> "0 18".
+on:
+  schedule:
+    - cron: '0 17 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install gspread google-auth
+
+      - name: Generate dashboard
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          SPREADSHEET_ID: '1G2JYQp-zvGEHEbBIJuniRG3itq0ysNdOGuVsy-WGKg4'
+        run: python scripts/generate_dashboard.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --staged --quiet || git commit -m "chore: daily dashboard refresh $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
