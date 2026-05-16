@@ -950,6 +950,14 @@
                 align-items: flex-start;
             }
         }
+        @media (max-width: 768px) {
+            .task-title, .task-description, .task-property, .win-item-text { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; word-break: break-word; overflow-wrap: anywhere; line-height: 1.4; }
+            .task-status-badge { white-space: normal; }
+            .task-buttons { flex-wrap: wrap; }
+            .quick-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .container { padding: 14px; max-width: 100%; overflow-x: hidden; }
+            .task-info { min-width: 0; width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -984,7 +992,7 @@
         <!-- PAGE HEADER -->
         <div class="page-header">
             <h1 class="page-title">Operations Tracker</h1>
-            <p class="page-subtitle">Last updated: May 16, 2026 at 08:05 PM</p>
+            <p class="page-subtitle">Last updated: May 16, 2026 at 09:21 PM</p>
         </div>
 
         <!-- QUICK ACTION CARDS -->
@@ -1071,11 +1079,11 @@
                 </div>
                 <div class="win-item">
                     <div class="win-check">✓</div>
-                   <div class="win-item-text">New leasing inquiry - Andrés (2BR $1795)</div>
+                   <div class="win-item-text">New leasing inquiry - Andrés</div>
                 </div>
                 <div class="win-item">
                     <div class="win-check">✓</div>
-                   <div class="win-item-text">Process On Demand Handyman Invoice 111</div>
+                   <div class="win-item-text">Process On Demand Handyman Invoice</div>
                 </div>
                 <div class="win-item">
                     <div class="win-check">✓</div>
