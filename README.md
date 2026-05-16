@@ -24,7 +24,7 @@ Notes on IDs
 
 Web App & Token
 - This widget is configured to use your Apps Script Web App:
-  WEB_APP_URL = https://script.google.com/macros/s/AKfycbzxDMKRS8kX6xmfI47mMttI4xKSwg3XaC6zSJZR4lnl9ldzPKmzoJqk6yerV3uV1DOD/exec
+  WEB_APP_URL = https://script.google.com/macros/s/AKfycbxbNL6TKDf1z2SS9HAczKvYN1oSnY1WOEuMPa4Qv9VY76OuewyeBLvADNQiJI4wtppP/exec
   SECRET_TOKEN = TPSMAYA4321
 
 Testing
