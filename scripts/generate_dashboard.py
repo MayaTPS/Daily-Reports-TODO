@@ -1,1232 +1,451 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TPS Operations Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        :root {
-            --tps-gold: #E8D5C4;
-            --tps-gold-light: #F5E6D3;
-            --tps-gold-dark: #D4AF95;
-            --tps-yellow: #CBB067;
-            --tps-purple: #764ba2;
-            --tps-purple-dark: #5a3a7a;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --text-muted: #999999;
-            --bg-primary: #ffffff;
-            --bg-secondary: #faf8f5;
-            --border: #e8e8e8;
-            --check-color: #4CAF50;
-            --status-red: #f44336;
-            --status-yellow: #FF9800;
-            --status-green: #4CAF50;
-            --status-blue: #2196F3;
-            --status-grey: #cccccc;
-        }
-        body.dark-mode {
-            --bg-primary: #0f0f0f;
-            --bg-secondary: #1a1a1a;
-            --text-primary: #f5f5f5;
-            --text-secondary: #b0b0b0;
-            --text-muted: #808080;
-            --border: #2a2a2a;
-        }
-        html, body {
-            height: 100%;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
-            line-height: 1.5;
-        }
-        /* NAVBAR */
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: #ffffff;
-            border-bottom: 2px solid #CBB067;
-            padding: 12px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-        body.dark-mode .navbar {
-            background: rgba(15, 15, 15, 0.95);
-            border-bottom-color: #CBB067;
-        }
-        .navbar-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        .navbar-logo-img {
-            height: 50px;
-            width: auto;
-            object-fit: contain;
-        }
-        .navbar-logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.4em;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-        .navbar-logo-img {
-            height: 50px;
-            width: auto;
-            object-fit: contain;
-            max-width: 200px;
-            display: block;
-        }
-        .navbar-brand {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .navbar-logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.1em;
-            font-weight: 700;
-            color: #1a1a1a;
-            line-height: 1.2;
-        }
-        .navbar-tagline {
-            font-size: 0.65em;
-            color: #CBB067;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .brand-gold {
-            color: #CBB067;
-        }
-        .brand-button {
-            background-color: #CBB067;
-            color: #ffffff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--border);
-            transition: 0.3s;
-            border-radius: 12px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: var(--tps-purple);
-        }
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-        /* CONTAINER */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px;
-        }
-        /* BRAND HEADER */
-        .brand-header {
-            text-align: center;
-            margin-bottom: 35px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid #e8e8e8;
-        }
-        .brand-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.2em;
-            font-weight: 700;
-            color: #CBB067;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-        .brand-tagline {
-            font-size: 0.95em;
-            color: #CBB067;
-            font-weight: 500;
-            font-style: italic;
-            letter-spacing: 0.5px;
-        }
-        /* PAGE HEADER */
-        .page-header {
-            margin-bottom: 25px;
-        }
-        .page-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 2em;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-        .page-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.95em;
-        }
-        /* QUICK ACTION CARDS */
-        .quick-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 35px;
-        }
-        .quick-card {
-            background: var(--bg-primary);
-            border: 1.5px solid var(--tps-gold);
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .quick-card:hover {
-            border-color: var(--tps-purple);
-            box-shadow: 0 0 20px rgba(118, 75, 162, 0.2);
-        }
-        .card-icon {
-            font-size: 2em;
-            margin-bottom: 8px;
-        }
-        .card-title {
-            font-weight: 600;
-            font-size: 0.9em;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-        .card-subtitle {
-            font-size: 0.75em;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-        .card-link {
-            text-decoration: none;
+#!/usr/bin/env python3
+"""
+TPS Daily Dashboard Generator
+Reads Google Sheets Operations Log + Archive, generates fresh index.html
+Runs daily at 7 AM EDT (11 AM UTC) via GitHub Actions
+
+Columns (A-I):
+  A: # (ID)
+  B: Date
+  C: Property
+  D: Task / Issue
+  E: Notes
+  F: Category
+  G: Priority
+  H: Assigned To
+  I: Status
+"""
+
+import os
+import json
+import re
+from datetime import datetime, timedelta
+from collections import defaultdict
+import gspread
+from google.oauth2.service_account import Credentials
+
+# Configuration
+SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID", "1PETs8uNdhJyLs0VibspKZk1Jts8hqQcaFcxKWneBiQ4")
+OPS_LOG_TAB = "Operations Log"
+ARCHIVE_TAB = "📦 Archive"
+INDEX_HTML = "index.html"
+
+# Category and status order
+CATEGORY_ORDER = ["Operations & Admin", "Leasing & Marketing", "Maintenance & Repairs", "Financials & Accounting", "Tenant Relations"]
+STATUS_ORDER = ["Stuck", "Maya Needs Help", "New", "In Progress", "FYI Only"]
+
+# Status values (exact match from sheet)
+STATUS_NEEDS_APPROVAL = "Needs Approval"
+STATUS_MAYA_NEEDS_HELP = "Maya Needs Help"
+STATUS_NEW = "New"
+STATUS_IN_PROGRESS = "In Progress"
+STATUS_STUCK = "Stuck"
+STATUS_FYI_ONLY = "FYI Only"
+
+def authenticate():
+    """Authenticate with Google Sheets API using service account."""
+    creds_json = os.environ.get("GOOGLE_CREDENTIALS")
+    if not creds_json:
+        raise ValueError("GOOGLE_CREDENTIALS environment variable not set")
+
+    creds_dict = json.loads(creds_json)
+    scopes = [
+        "https://www.googleapis.com/auth/spreadsheets.readonly",
+        "https://www.googleapis.com/auth/drive.readonly",
+    ]
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+    return gspread.authorize(creds)
+
+def html_escape(text):
+    """Escape HTML special characters."""
+    if not text:
+        return ""
+    return (str(text).replace("&", "&amp;")
+                     .replace("<", "&lt;")
+                     .replace(">", "&gt;")
+                     .replace('"', "&quot;"))
+
+def fetch_operations_log(client):
+    """Read Operations Log sheet and return tasks grouped by category and status."""
+    sheet = client.open_by_key(SPREADSHEET_ID)
+    ws = sheet.worksheet(OPS_LOG_TAB)
+
+    # Get all values as raw data
+    all_values = ws.get_all_values()
+
+    # Find header row (contains "Task / Issue")
+    header_idx = 0
+    headers = None
+    for idx, row in enumerate(all_values):
+        if "Task / Issue" in row:
+            header_idx = idx
+            headers = row
+            break
+
+    if not headers:
+        print("  WARNING: Could not find header row with 'Task / Issue'")
+        return defaultdict(lambda: defaultdict(list))
+
+    # Initialize nested structure: {category: {status: [tasks]}}
+    tasks_by_category_status = defaultdict(lambda: defaultdict(list))
+
+    # Process data rows (skip header and everything before it)
+    for row in all_values[header_idx + 1:]:
+        if not any(row):  # Skip completely empty rows
+            continue
+
+        # Create a dict from headers and row values
+        row_dict = {}
+        for i, header in enumerate(headers):
+            row_dict[header] = row[i] if i < len(row) else ""
+
+        # Skip if no task
+        task = row_dict.get("Task / Issue", "").strip()
+        if not task:
+            continue
+
+        status = row_dict.get("Status", "").strip()
+        category = row_dict.get("Category", "").strip() or "General"
+
+        # Skip if invalid status
+        valid_statuses = [STATUS_NEEDS_APPROVAL, STATUS_MAYA_NEEDS_HELP, STATUS_NEW,
+                         STATUS_IN_PROGRESS, STATUS_STUCK, STATUS_FYI_ONLY]
+        if status not in valid_statuses:
+            continue
+
+        task_data = {
+            "property": row_dict.get("Property", "").strip(),
+            "task": task,
+            "notes": row_dict.get("Notes", "").strip(),
+            "assigned": row_dict.get("Assigned To", "").strip(),
+            "priority": row_dict.get("Priority", "").strip(),
+            "category": category,
+            "status": status,
         }
 
-        /* ===== UNIFIED BUTTON STYLE ===== */
-        .unified-btn {
-            font-size: 14px;
-            padding: 0.6em 1.8em;
-            letter-spacing: 0.05em;
-            position: relative;
-            font-family: inherit;
-            border-radius: 0.6em;
-            overflow: hidden;
-            transition: all 0.3s;
-            line-height: 1.4em;
-            border: 2px solid;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            text-decoration: none;
-            white-space: nowrap;
-            height: 38px;
-            width: 140px;
-        }
+        tasks_by_category_status[category][status].append(task_data)
 
-        /* PAY NOW - Black Button */
-        .pay-btn {
-            background: #1a1a1a;
-            color: white;
-            border-color: #1a1a1a;
-        }
-        .pay-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-        }
-        .icon-container {
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .icon {
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            color: #22c55e;
-            opacity: 0;
-            visibility: hidden;
-        }
-        .wallet-icon {
-            opacity: 1;
-            visibility: visible;
-        }
-        .pay-btn:hover .wallet-icon {
-            opacity: 0;
-            visibility: hidden;
-        }
-        .pay-btn:hover .card-icon {
-            animation: iconRotate 2.5s infinite;
-            animation-delay: 0s;
-        }
-        .pay-btn:hover .payment-icon {
-            animation: iconRotate 2.5s infinite;
-            animation-delay: 0.5s;
-        }
-        .pay-btn:hover .dollar-icon {
-            animation: iconRotate 2.5s infinite;
-            animation-delay: 1s;
-        }
-        .pay-btn:hover .check-icon {
-            animation: iconRotate 2.5s infinite;
-            animation-delay: 1.5s;
-        }
+    return tasks_by_category_status
 
-        /* UPLOAD - Green Button */
-        .upload-btn {
-            background: linear-gradient(180deg, hsla(0, 0%, 100%, .1), hsla(0, 0%, 100%, 0)), hsl(128, 52%, 45%);
-            color: #fff;
-            border-color: hsl(128, 50%, 45%);
-            box-shadow: 0 1px 2px #25114f66;
-        }
-        .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-        }
-        .upload-btn svg {
-            width: 16px;
-            height: 16px;
-            flex-shrink: 0;
-        }
+def fetch_archive(client, limit=9):
+    """Read Archive sheet and return last N items (newest first)."""
+    sheet = client.open_by_key(SPREADSHEET_ID)
+    ws = sheet.worksheet(ARCHIVE_TAB)
 
-        /* PICK A TIME - Red Button */
-        .calendly-btn {
-            background: #FF342B;
-            color: white;
-            border-color: #FF342B;
-        }
-        .calendly-btn:hover {
-            background: #e52e26;
-            border-color: #e52e26;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 52, 43, 0.3);
-        }
-        .calendly-btn:hover svg {
-            animation: slope 1s linear infinite;
-        }
-        .calendly-btn svg {
-            width: 16px;
-            height: 16px;
-            flex-shrink: 0;
-        }
+    # Get all values as raw data
+    all_values = ws.get_all_values()
 
-        /* CLOCK IN - Neon Green Button */
-        .clock-btn {
-            font-size: 14px;
-            padding: 0.6em 1.8em;
-            letter-spacing: 0.05em;
-            position: relative;
-            font-family: inherit;
-            border-radius: 0.6em;
-            overflow: hidden;
-            transition: all 0.3s;
-            line-height: 1.4em;
-            border: 2px solid #1BFD9C;
-            background: linear-gradient(to right, rgba(27, 253, 156, 0.1) 1%, transparent 40%, transparent 60%, rgba(27, 253, 156, 0.1) 100%);
-            color: #1BFD9C;
-            box-shadow: inset 0 0 10px rgba(27, 253, 156, 0.4), 0 0 9px 3px rgba(27, 253, 156, 0.1);
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 38px;
-            width: 140px;
-        }
-        .clock-btn:hover {
-            color: #82ffc9;
-            box-shadow: inset 0 0 10px rgba(27, 253, 156, 0.6), 0 0 9px 3px rgba(27, 253, 156, 0.2);
-        }
-        .clock-btn:before {
-            content: "";
-            position: absolute;
-            left: -4em;
-            width: 4em;
-            height: 100%;
-            top: 0;
-            transition: transform .4s ease-in-out;
-            background: linear-gradient(to right, transparent 1%, rgba(27, 253, 156, 0.1) 40%, rgba(27, 253, 156, 0.1) 60%, transparent 100%);
-            z-index: 0;
-        }
-        .clock-btn:hover:before {
-            transform: translateX(15em);
-        }
-        .clock-btn span {
-            position: relative;
-            z-index: 1;
-        }
-        /* QUICK WINS BOX */
-        .wins-box {
-            background: var(--bg-primary);
-            border-radius: 12px;
-            padding: 32px;
-            border: 2px solid var(--tps-gold);
-            margin-bottom: 40px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-        .wins-header {
-            margin-bottom: 28px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 2px solid var(--tps-gold-light);
-            padding-bottom: 16px;
-        }
-        .wins-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-        body.dark-mode .wins-title {
-            color: #ffffff;
-        }
-        .wins-subtitle {
-            font-size: 0.75em;
-            color: var(--tps-purple);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-left: auto;
-        }
-        /* 3-COLUMN GRID - 9 ITEMS */
-        .wins-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-        /* WIN ITEM */
-        .win-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 14px;
-            background: linear-gradient(135deg, rgba(244, 208, 63, 0.08) 0%, rgba(232, 213, 196, 0.1) 100%);
-            border-radius: 8px;
-            border-left: 3px solid var(--check-color);
-            transition: all 0.3s ease;
-        }
-        .win-item:hover {
-            transform: translateX(4px);
-            background: linear-gradient(135deg, rgba(244, 208, 63, 0.12) 0%, rgba(232, 213, 196, 0.15) 100%);
-        }
-        .win-check {
-            flex-shrink: 0;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--check-color);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.75em;
-            margin-top: 2px;
-        }
-        .win-item-text {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            line-height: 1.4;
-            font-weight: 500;
-        }
-        /* CATEGORY SECTION */
-        .category-section {
-            margin-bottom: 40px;
-        }
-        .category-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.6em;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--tps-gold);
-        }
-        /* TASKS LIST */
-        .tasks-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        /* TASK ITEM - SINGLE ROW */
-        .task-item {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 12px 16px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .task-item:hover {
-            border-color: var(--tps-purple);
-            box-shadow: 0 0 12px rgba(118, 75, 162, 0.2);
-        }
-        .task-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            justify-content: space-between;
-        }
-        .task-info {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-        }
-        .task-expand-btn {
-            background: none;
-            border: none;
-            color: var(--tps-gold);
-            font-size: 1.2em;
-            cursor: pointer;
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: transform 0.2s ease, color 0.2s ease;
-        }
-        .task-expand-btn:hover {
-            color: var(--tps-purple);
-        }
-        .task-expand-btn.expanded {
-            transform: rotate(180deg);
-        }
-        .task-title {
-            font-weight: 500;
-            font-size: 0.9em;
-            color: var(--text-primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .task-property {
-            font-size: 0.75em;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .task-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-        .task-status-badge {
-            display: inline-block;
-            font-size: 0.65em;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
-            white-space: nowrap;
-        }
-        /* Status Colors */
-        .status-approval {
-            background: rgba(76, 175, 80, 0.15);
-            color: var(--status-green);
-            border: 1px solid var(--status-green);
-        }
-        .status-stuck {
-            background: rgba(244, 67, 54, 0.15);
-            color: var(--status-red);
-            border: 1px solid var(--status-red);
-        }
-        .status-maya-help {
-            background: rgba(244, 67, 54, 0.15);
-            color: var(--status-red);
-            border: 1px solid var(--status-red);
-        }
-        .status-in-progress {
-            background: rgba(255, 152, 0, 0.15);
-            color: var(--status-yellow);
-            border: 1px solid var(--status-yellow);
-        }
-        .status-new {
-            background: rgba(33, 150, 243, 0.15);
-            color: var(--status-blue);
-            border: 1px solid var(--status-blue);
-        }
-        .status-fyi {
-            background: rgba(204, 204, 204, 0.15);
-            color: #666666;
-            border: 1px solid #cccccc;
-        }
-        /* EXPANDED CONTENT */
-        .task-expanded {
-            display: none;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border);
-        }
-        .task-item.expanded .task-expanded {
-            display: block;
-        }
-        .task-description {
-            font-size: 0.9em;
-            color: var(--text-primary);
-            line-height: 1.5;
-            margin-bottom: 12px;
-        }
-        .task-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .task-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+    # Find header row
+    header_idx = 0
+    headers = None
+    for idx, row in enumerate(all_values):
+        if "Task / Issue" in row or "Task" in row:
+            header_idx = idx
+            headers = row
+            break
 
-        /* ===== CUSTOM CHECKBOX "DONE" BUTTON ===== */
-        .checkbox-container {
-            display: inline-block;
-        }
-        .task-checkbox {
-            display: none;
-        }
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            color: #10b981;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1.5px solid #10b981;
-            background: rgba(16, 185, 129, 0.08);
-        }
-        .checkbox-label:hover {
-            background: rgba(16, 185, 129, 0.15);
-            color: #059669;
-        }
-        .checkbox-box {
-            position: relative;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #d1d5db;
-            border-radius: 4px;
-            margin-right: 8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: visible;
-        }
-        .checkbox-fill {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            transform: scale(0);
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            border-radius: 3px;
-            opacity: 0;
-        }
-        .checkmark {
-            position: relative;
-            z-index: 2;
-            opacity: 0;
-            transform: scale(0.3) rotate(20deg);
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-        .check-icon {
-            width: 12px;
-            height: 12px;
-            fill: white;
-            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
-        }
-        .success-ripple {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(16, 185, 129, 0.4);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            pointer-events: none;
-        }
-        .checkbox-text {
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .checkbox-text::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #6b7280;
-            transition: width 0.4s ease;
-            transform: translateY(-50%);
-        }
-        .checkbox-label:hover .checkbox-box {
-            border-color: #10b981;
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
-        }
-        .task-checkbox:checked + .checkbox-label .checkbox-box {
-            border-color: #10b981;
-            background: #10b981;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3), 0 0 0 2px rgba(16, 185, 129, 0.2);
-        }
-        .task-checkbox:checked + .checkbox-label .checkbox-fill {
-            transform: scale(1);
-            opacity: 1;
-        }
-        .task-checkbox:checked + .checkbox-label .checkmark {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-            animation: checkPop 0.3s ease-out 0.2s;
-        }
-        .task-checkbox:checked + .checkbox-label .success-ripple {
-            animation: rippleSuccess 0.6s ease-out;
-        }
-        .task-checkbox:checked + .checkbox-label .checkbox-text {
-            color: #6b7280;
-        }
-        .task-checkbox:checked + .checkbox-label .checkbox-text::after {
-            width: 100%;
-        }
-        .checkbox-label:active .checkbox-box {
-            transform: scale(0.95);
-        }
-        @keyframes checkPop {
-            0% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.2) rotate(-5deg); }
-            100% { transform: scale(1) rotate(0deg); }
-        }
-        @keyframes rippleSuccess {
-            0% {
-                width: 0;
-                height: 0;
-                opacity: 0.6;
+    if not headers:
+        print("  WARNING: Could not find header row in Archive sheet")
+        return []
+
+    items = []
+    # Process data rows in reverse order (newest first)
+    for row in reversed(all_values[header_idx + 1:]):
+        if not any(row):  # Skip empty rows
+            continue
+
+        # Create a dict from headers and row values
+        row_dict = {}
+        for i, header in enumerate(headers):
+            row_dict[header] = row[i] if i < len(row) else ""
+
+        # Skip if no task
+        task = row_dict.get("Task / Issue", "").strip()
+        if not task:
+            continue
+
+        items.append({
+            "property": row_dict.get("Property", "").strip(),
+            "task": task,
+            "notes": row_dict.get("Notes", "").strip(),
+            "assigned": row_dict.get("Assigned To", "").strip(),
+            "priority": row_dict.get("Priority", "").strip(),
+            "category": row_dict.get("Category", "").strip(),
+        })
+
+        if len(items) >= limit:
+            break
+
+    return items
+
+def build_task_item(task, item_id=None):
+    """Generate HTML for a task item in the new design."""
+    property_val = html_escape(task.get("property", ""))
+    task_text = html_escape(task.get("task", ""))
+    notes_text = html_escape(task.get("notes", ""))
+    priority = html_escape(task.get("priority", ""))
+    assigned = html_escape(task.get("assigned", ""))
+    status = task.get("status", "")
+
+    # Generate a simple ID if not provided
+    if not item_id:
+        item_id = f"task-{task_text[:10].replace(' ', '-')}"
+
+    # Build priority class and label
+    priority_class = "medium"
+    priority_label = "MEDIUM"
+    if priority:
+        priority_clean = priority.lower()
+        if "high" in priority_clean:
+            priority_class = "high"
+            priority_label = "HIGH"
+        elif "low" in priority_clean:
+            priority_class = "low"
+            priority_label = "LOW"
+        elif "medium" in priority_clean:
+            priority_class = "medium"
+            priority_label = "MEDIUM"
+
+    # Status class mapping
+    status_class_map = {
+        "Needs Approval": "status-approval",
+        "Maya Needs Help": "status-maya-help",
+        "New": "status-new",
+        "In Progress": "status-in-progress",
+        "Stuck": "status-stuck",
+        "FYI Only": "status-fyi",
+    }
+    status_class = status_class_map.get(status, "status-fyi")
+
+    # Build task header
+    html = f'            <div class="task-card">\n'
+    html += f'                <div class="task-header">\n'
+    html += f'                    <div class="task-info">\n'
+    if property_val:
+        html += f'                        <div class="task-location">{property_val}</div>\n'
+    html += f'                        <div class="task-title">{task_text}</div>\n'
+    if notes_text:
+        html += f'                        <div class="task-description">{notes_text}</div>\n'
+    html += f'                        <div class="task-meta">\n'
+    html += f'                            <div class="priority-dot priority-{priority_class}"></div>\n'
+    html += f'                            <span>{priority_label}</span>\n'
+    if assigned:
+        html += f'                            <span>• {assigned}</span>\n'
+    html += f'                        </div>\n'
+    html += f'                        <div class="task-status-badge {status_class}">{status}</div>\n'
+    html += f'                    </div>\n'
+    html += f'                </div>\n'
+
+    # Build task controls based on status
+    html += f'                <div class="task-controls">\n'
+
+    if status == "Needs Approval":
+        html += f'                    <div class="btn-group">\n'
+        html += f'                        <button class="btn-control" onclick="setResponse(\'{item_id}\', this, \'approved\', \'active-green\')">Approved</button>\n'
+        html += f'                        <button class="btn-control" onclick="setResponse(\'{item_id}\', this, \'on-hold\', \'active-yellow\')">On Hold</button>\n'
+        html += f'                        <button class="btn-control" onclick="setResponse(\'{item_id}\', this, \'rejected\', \'active-red\')">Rejected</button>\n'
+        html += f'                    </div>\n'
+    elif status == "New":
+        html += f'                    <div class="btn-group">\n'
+        html += f'                        <button class="btn-control" onclick="setResponse(\'{item_id}\', this, \'tricia\', \'active-blue\')">Tricia on it</button>\n'
+        html += f'                        <button class="btn-control" onclick="setResponse(\'{item_id}\', this, \'maya\', \'active-blue\')">Maya on it</button>\n'
+        html += f'                        <button class="btn-control" onclick="setResponse(\'{item_id}\', this, \'done\', \'active-blue\')">Done</button>\n'
+        html += f'                    </div>\n'
+    elif status == "In Progress":
+        html += f'                    <div class="btn-group">\n'
+        html += f'                        <button class="btn-control" onclick="setResponse(\'{item_id}\', this, \'done\', \'active-blue\')">Done</button>\n'
+        html += f'                    </div>\n'
+    elif status == "FYI Only":
+        html += f'                    <div class="btn-group">\n'
+        html += f'                        <button class="btn-control" onclick="setResponse(\'{item_id}\', this, \'done\', \'active-blue\')">Done</button>\n'
+        html += f'                    </div>\n'
+    # For "Stuck" and "Maya Needs Help", no buttons, just textarea
+
+    html += f'                    <textarea class="comment-box" id="note-{item_id}" placeholder="Add a note..." onchange="updateNote(\'{item_id}\', this)"></textarea>\n'
+    html += f'                </div>\n'
+    html += f'            </div>\n'
+
+    return html
+
+def build_quick_wins(archive_items):
+    """Generate HTML for Quick Wins section from archive items.
+    Intelligently combines Task + Notes into concise summaries."""
+    if not archive_items:
+        return '                <li>No recent completions</li>'
+
+    items = []
+    for item in archive_items:
+        property_val = html_escape(item.get("property", ""))
+        task_text = html_escape(item.get("task", ""))
+        notes_text = html_escape(item.get("notes", "")).strip()
+
+        # Extract key info from task and notes
+        # Remove common prefixes (Process, Complete, etc.)
+        clean_task = task_text
+        for prefix in ["Process ", "Complete ", "Paid ", "Send ", "File ", "Review ", "Update ", "Handle "]:
+            if clean_task.startswith(prefix):
+                clean_task = clean_task[len(prefix):]
+
+        # Build intelligent summary from task + notes
+        if notes_text:
+            # Look for key patterns in notes
+            summary = f"{clean_task}"
+
+            # Add notes as context if it's short and meaningful
+            if len(notes_text) < 40 and notes_text.lower() not in ("done", "completed", "paid", "sent"):
+                summary = f"{clean_task} - {notes_text}"
+            elif any(char.isdigit() for char in notes_text):
+                # If notes contain numbers (amounts, dates, etc.), include them
+                summary = f"{clean_task} {notes_text}"
+            else:
+                summary = clean_task
+        else:
+            summary = clean_task
+
+        # Add property if it's specific (not generic)
+        if property_val and property_val.lower() not in ("general", "n/a", "", "tps"):
+            summary = f"{property_val} - {summary}"
+
+        # Truncate if too long
+        if len(summary) > 75:
+            summary = summary[:72] + "..."
+
+        items.append(f'                <li>{summary}</li>')
+
+    return '\n'.join(items)
+
+def inject_into_html(tasks_by_category_status, archive_items):
+    """Inject generated content into index.html between markers."""
+    with open(INDEX_HTML, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    now = datetime.now().strftime("%B %d, %Y at %I:%M %p")
+
+    # Build HTML sections organized by category and status
+    category_sections = {}
+
+    for category in CATEGORY_ORDER:
+        if category not in tasks_by_category_status:
+            category_sections[category] = ""
+            continue
+
+        category_html = ""
+        for status in STATUS_ORDER:
+            tasks = tasks_by_category_status[category].get(status, [])
+            if not tasks:
+                continue
+
+            # Build status subsection
+            status_class_map = {
+                "Stuck": "status-stuck",
+                "Maya Needs Help": "status-maya-help",
+                "New": "status-new",
+                "In Progress": "status-in-progress",
+                "FYI Only": "status-fyi",
             }
-            70% {
-                width: 50px;
-                height: 50px;
-                opacity: 0.3;
-            }
-            100% {
-                width: 60px;
-                height: 60px;
-                opacity: 0;
-            }
-        }
+            status_class = status_class_map.get(status, "status-fyi")
 
-        /* ===== OUTLINED BUTTONS ===== */
-        .btn-outlined {
-            padding: 6px 14px;
-            border: 1.5px solid;
-            background: transparent;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
-        }
-        .btn-tricia {
-            border-color: #a885d1;
-            color: #764ba2;
-            background: rgba(168, 133, 209, 0.1);
-        }
-        .btn-tricia:hover {
-            background: rgba(168, 133, 209, 0.15);
-            border-color: #ddd6fe;
-        }
-        .btn-maya {
-            border-color: #f0a8d8;
-            color: #ec4899;
-        }
-        .btn-maya:hover {
-            background: rgba(236, 72, 153, 0.08);
-            border-color: #ec4899;
-        }
-        .btn-approve {
-            border-color: #86efac;
-            color: var(--status-green);
-        }
-        .btn-approve:hover {
-            background: rgba(76, 175, 80, 0.08);
-            border-color: var(--status-green);
-        }
-        .btn-hold {
-            border-color: #fcd34d;
-            color: #f59e0b;
-        }
-        .btn-hold:hover {
-            background: rgba(245, 158, 11, 0.08);
-            border-color: #f59e0b;
-        }
-        .btn-reject {
-            border-color: #fca5a5;
-            color: var(--status-red);
-        }
-        .btn-reject:hover {
-            background: rgba(244, 67, 54, 0.08);
-            border-color: var(--status-red);
-        }
+            category_html += f'        <div class="status-subsection">\n'
+            category_html += f'            <h4 class="status-subheader {status_class}">● {status} ({len(tasks)})</h4>\n'
+            category_html += f'            <div class="tasks-list">\n'
 
-        /* ===== CUSTOM TEXTBOX ===== */
-        .task-comment-input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1.5px solid var(--tps-yellow);
-            border-radius: 6px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            resize: vertical;
-            min-height: 50px;
-            transition: all 0.3s ease;
-        }
-        .task-comment-input:focus {
-            outline: none;
-            border-color: var(--tps-purple);
-            background: var(--bg-primary);
-            box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.08);
-        }
-        .task-comment-input::placeholder {
-            color: #a0a0a0;
-            font-weight: 500;
-        }
+            for idx, task in enumerate(tasks):
+                item_id = f"{category.lower()}-{status.lower().replace(' ', '-')}-{idx}"
+                category_html += build_task_item(task, item_id)
 
-        .comment-save-btn {
-            padding: 6px 12px;
-            border: 1px solid var(--border);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        .comment-save-btn:hover {
-            border-color: var(--tps-purple);
-            background: var(--bg-primary);
-        }
+            category_html += f'            </div>\n'
+            category_html += f'        </div>\n'
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-            font-size: 0.9em;
-        }
+        category_sections[category] = category_html
 
-        /* ===== CUSTOM BUTTON STYLES ===== */
+    # Build Quick Wins
+    quick_wins_html = build_quick_wins(archive_items)
 
-        @keyframes iconRotate {
-            0% {
-                opacity: 0;
-                visibility: hidden;
-                transform: translateY(10px) scale(0.5);
-            }
-            5% {
-                opacity: 1;
-                visibility: visible;
-                transform: translateY(0) scale(1);
-            }
-            15% {
-                opacity: 1;
-                visibility: visible;
-                transform: translateY(0) scale(1);
-            }
-            20% {
-                opacity: 0;
-                visibility: hidden;
-                transform: translateY(-10px) scale(0.5);
-            }
-            100% {
-                opacity: 0;
-                visibility: hidden;
-                transform: translateY(-10px) scale(0.5);
-            }
-        }
-        @keyframes checkmarkAppear {
-            0% {
-                opacity: 0;
-                transform: scale(0.5) rotate(-45deg);
-            }
-            50% {
-                opacity: 0.5;
-                transform: scale(1.2) rotate(0deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) rotate(0deg);
-            }
-        }
-        @keyframes slope {
-            0% { }
-            50% {
-                transform: rotate(10deg);
-            }
-            100% { }
-        }
+    # Inject each section
+    markers = {
+        "QUICK_WINS": ("<!-- QUICK_WINS_START -->", "<!-- QUICK_WINS_END -->"),
+        "OPERATIONS_ADMIN": ("<!-- OPERATIONS_ADMIN_START -->", "<!-- OPERATIONS_ADMIN_END -->"),
+        "LEASING_MARKETING": ("<!-- LEASING_MARKETING_START -->", "<!-- LEASING_MARKETING_END -->"),
+        "MAINTENANCE_REPAIRS": ("<!-- MAINTENANCE_REPAIRS_START -->", "<!-- MAINTENANCE_REPAIRS_END -->"),
+        "FINANCIALS_ACCOUNTING": ("<!-- FINANCIALS_ACCOUNTING_START -->", "<!-- FINANCIALS_ACCOUNTING_END -->"),
+        "TENANT_RELATIONS": ("<!-- TENANT_RELATIONS_START -->", "<!-- TENANT_RELATIONS_END -->"),
+    }
 
-        /* Remove all underlines */
-        a {
-            text-decoration: none;
-        }
-        @media (max-width: 1024px) {
-            .wins-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            .wins-grid {
-                grid-template-columns: 1fr;
-            }
-            .task-info {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .task-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="navbar-left">
-            <img src="" alt="TPS Property Management Logo" class="navbar-logo-img" id="navbar-logo">
-            <div class="navbar-brand">
-                <div class="navbar-logo">TPS Property Management</div>
-                <div class="navbar-tagline">Operations Dashboard</div>
-            </div>
-        </div>
-        <div class="navbar-right">
-            <label style="border: none; background: transparent; padding: 0; gap: 10px; cursor: pointer; display: flex; align-items: center;">
-                <span>🌙</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
-                    <span class="slider"></span>
-                </label>
-            </label>
-        </div>
-    </nav>
+    # Map category names to marker keys
+    category_markers = {
+        "Operations & Admin": "OPERATIONS_ADMIN",
+        "Leasing & Marketing": "LEASING_MARKETING",
+        "Maintenance & Repairs": "MAINTENANCE_REPAIRS",
+        "Financials & Accounting": "FINANCIALS_ACCOUNTING",
+        "Tenant Relations": "TENANT_RELATIONS",
+    }
 
-    <!-- MAIN CONTENT -->
-    <div class="container">
-        <!-- BRAND HEADER -->
-        <div class="brand-header">
-            <div class="brand-name">TPS Property Management</div>
-            <div class="brand-tagline">"Raising the bar in industry standards"</div>
-        </div>
+    for category, marker_key in category_markers.items():
+        start_marker, end_marker = markers[marker_key]
+        pattern = re.escape(start_marker) + r'.*?' + re.escape(end_marker)
+        content = category_sections.get(category, "")
+        replacement = f"{start_marker}\n{content}            {end_marker}"
 
-        <!-- PAGE HEADER -->
-        <div class="page-header">
-            <h1 class="page-title">Operations Tracker</h1>
-            <p class="page-subtitle">Last updated: <!-- LAST_UPDATED --></p>
-        </div>
+        if re.search(pattern, html, re.DOTALL):
+            html = re.sub(pattern, replacement, html, flags=re.DOTALL)
+        else:
+            print(f"  WARNING: {marker_key} markers not found in HTML")
 
-        <!-- QUICK ACTION CARDS -->
-        <div class="quick-cards">
-            <div class="quick-card">
-                <div class="card-icon">📅</div>
-                <div class="card-title">My Calendly</div>
-                <div class="card-subtitle">Schedule a meeting</div>
-                <a href="https://calendly.com/maya-tpropertysolutions/maya-tricia" target="_blank" class="unified-btn calendly-btn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    <span>Pick a Time</span>
-                </a>
-            </div>
-            <div class="quick-card">
-                <div class="card-icon">💳</div>
-                <div class="card-title">Payment</div>
-                <div class="card-subtitle">Process invoices</div>
-                <a href="https://wise.com/pay/r/U36Y7yWMiwln8YY" target="_blank" class="unified-btn pay-btn">
-                    <div class="icon-container">
-                        <svg class="icon wallet-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18 8H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 14H6V10h12v12zm-6-3c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"/>
-                        </svg>
-                        <svg class="icon card-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20 8H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H4V10h16v10zm-4-6h-2v-2h2v2z"/>
-                        </svg>
-                        <svg class="icon payment-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-                        </svg>
-                        <svg class="icon dollar-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-                        </svg>
-                        <svg class="icon check-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-                        </svg>
-                    </div>
-                    <span>Pay Now</span>
-                </a>
-            </div>
-            <div class="quick-card">
-                <div class="card-icon">📁</div>
-                <div class="card-title">Expenses & Invoices</div>
-                <div class="card-subtitle">Upload & organize</div>
-                <a href="https://drive.google.com/drive/folders/1udSCvVZGOu7A1faxH65xQHF9kghy1_o4" target="_blank" class="unified-btn upload-btn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
-                    <span>Upload</span>
-                </a>
-            </div>
-            <div class="quick-card">
-                <div class="card-icon">⏰</div>
-                <div class="card-title">Time Tracker</div>
-                <div class="card-subtitle">Track your time</div>
-                <a href="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExemVheG1tY2s3OGZ0bXFhYzBlbGp0czEwOTdjMXI4czZ6Nnd6Z3BtZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/5xtDarzgzG6eu6uVwI0/giphy.gif" target="_blank" class="unified-btn clock-btn">
-                    <span>Clock In</span>
-                </a>
-            </div>
-        </div>
+    # Inject Quick Wins
+    start_marker, end_marker = markers["QUICK_WINS"]
+    pattern = re.escape(start_marker) + r'.*?' + re.escape(end_marker)
+    replacement = f"{start_marker}\n{quick_wins_html}\n            {end_marker}"
 
-        <!-- QUICK WINS BOX -->
-        <div class="wins-box">
-            <div class="wins-header">
-                <div class="wins-title">Quick Wins</div>
-                <div class="wins-subtitle">Closed Items</div>
-            </div>
-            <div class="wins-grid">
-                <!-- QUICK_WINS_START -->
-                <!-- QUICK_WINS_END -->
-            </div>
-        </div>
+    if re.search(pattern, html, re.DOTALL):
+        html = re.sub(pattern, replacement, html, flags=re.DOTALL)
 
-        <!-- OPERATIONS & ADMIN SECTION -->
-        <div class="category-section">
-            <h2 class="category-title">Operations & Admin</h2>
-            <div class="tasks-list">
-                <!-- OPERATIONS_ADMIN_START -->
-                <!-- OPERATIONS_ADMIN_END -->
-            </div>
-        </div>
+    # Write updated HTML
+    with open(INDEX_HTML, "w", encoding="utf-8") as f:
+        f.write(html)
 
-        <!-- LEASING & MARKETING SECTION -->
-        <div class="category-section">
-            <h2 class="category-title">Leasing & Marketing</h2>
-            <div class="tasks-list">
-                <!-- LEASING_MARKETING_START -->
-                <!-- LEASING_MARKETING_END -->
-            </div>
-        </div>
+    # Print summary
+    total_count = sum(sum(len(tasks) for tasks in statuses.values())
+                     for statuses in tasks_by_category_status.values())
+    print(f"✓ Dashboard updated at {now}")
+    for category in CATEGORY_ORDER:
+        if category in tasks_by_category_status:
+            cat_total = sum(len(tasks) for tasks in tasks_by_category_status[category].values())
+            print(f"  {category}: {cat_total} tasks")
+            for status in STATUS_ORDER:
+                count = len(tasks_by_category_status[category].get(status, []))
+                if count > 0:
+                    print(f"    - {status}: {count}")
+    print(f"  Quick Wins: {len(archive_items)}")
 
-        <!-- MAINTENANCE & REPAIRS SECTION -->
-        <div class="category-section">
-            <h2 class="category-title">Maintenance & Repairs</h2>
-            <div class="tasks-list">
-                <!-- MAINTENANCE_REPAIRS_START -->
-                <!-- MAINTENANCE_REPAIRS_END -->
-            </div>
-        </div>
+def main():
+    print("🔄 TPS Dashboard Generator")
+    print("=" * 50)
 
-        <!-- FINANCIALS & ACCOUNTING SECTION -->
-        <div class="category-section">
-            <h2 class="category-title">Financials & Accounting</h2>
-            <div class="tasks-list">
-                <!-- FINANCIALS_ACCOUNTING_START -->
-                <!-- FINANCIALS_ACCOUNTING_END -->
-            </div>
-        </div>
+    try:
+        print("Authenticating with Google Sheets...")
+        client = authenticate()
 
-        <!-- TENANT RELATIONS SECTION -->
-        <div class="category-section">
-            <h2 class="category-title">Tenant Relations</h2>
-            <div class="tasks-list">
-                <!-- TENANT_RELATIONS_START -->
-                <!-- TENANT_RELATIONS_END -->
-            </div>
-        </div>
-    </div>
+        print("Reading Operations Log...")
+        ops_by_cat_status = fetch_operations_log(client)
+        total_ops = sum(sum(len(tasks) for tasks in statuses.values())
+                       for statuses in ops_by_cat_status.values())
+        print(f"  Found {total_ops} tasks across all categories")
 
-    <script>
-        // ===== GOOGLE APPS SCRIPT CONFIGURATION =====
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziM6s2X7p6hPoo-AVj_JCPzgPbt-yUvqptE5AnQheQCXi6fg9jtDbir8PBXQw7hQkW/exec";
+        print("Reading 📦 Archive...")
+        arc = fetch_archive(client, limit=9)
+        print(f"  Found {len(arc)} archived items")
 
-        // ===== SET LOGO URL =====
-        function setLogoUrl(url) {
-            const logo = document.getElementById('navbar-logo');
-            if (logo) {
-                logo.src = url;
-                logo.style.display = 'block';
-            }
-        }
+        print("Generating HTML...")
+        inject_into_html(ops_by_cat_status, arc)
 
-        // ===== SEND RESPONSE TO GOOGLE APPS SCRIPT =====
-        function setResponse(itemId, buttonElement, action) {
-            const taskItem = buttonElement.closest('.task-item');
-            if (!taskItem) return;
+        print("=" * 50)
+        print("✓ Done! Dashboard is fresh.")
 
-            const property = taskItem.querySelector('.task-property')?.textContent?.trim() || 'Unknown';
-            const title = taskItem.querySelector('.task-title')?.textContent?.trim() || 'Unknown';
+    except Exception as e:
+        print(f"✗ Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
 
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    property: property,
-                    description: title,
-                    status: action,
-                    note: ''
-                })
-            }).then(r => r.json()).then(data => {
-                if (data.success) {
-                    console.log('✓ Logged to sheet:', data.timestamp);
-                } else {
-                    console.error('Error:', data.error);
-                }
-            }).catch(err => console.error('Fetch error:', err));
-        }
-
-        // ===== SEND NOTE UPDATE TO GOOGLE APPS SCRIPT =====
-        function updateNote(itemId, textareaElement) {
-            const taskItem = textareaElement.closest('.task-item');
-            if (!taskItem) return;
-
-            const property = taskItem.querySelector('.task-property')?.textContent?.trim() || 'Unknown';
-            const title = taskItem.querySelector('.task-title')?.textContent?.trim() || 'Unknown';
-            const note = textareaElement.value?.trim();
-
-            if (!note) return; // Don't send empty notes
-
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    property: property,
-                    description: title,
-                    status: '',
-                    note: note
-                })
-            }).then(r => r.json()).then(data => {
-                if (data.success) {
-                    console.log('✓ Note saved:', data.timestamp);
-                } else {
-                    console.error('Error:', data.error);
-                }
-            }).catch(err => console.error('Fetch error:', err));
-        }
-
-        // ===== EXPAND/COLLAPSE TASK ITEMS =====
-        function toggleExpand(element) {
-            element.classList.toggle('expanded');
-            const btn = element.querySelector('.task-expand-btn');
-            if (btn) btn.classList.toggle('expanded');
-        }
-
-        // ===== DARK MODE TOGGLE =====
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-        }
-
-        // Load dark mode preference on page load
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('darkModeToggle').checked = true;
-        }
-
-        // ===== ATTACH EXPAND LISTENERS TO TASK ITEMS =====
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.task-item').forEach(item => {
-                item.addEventListener('click', function(e) {
-                    // Check if clicking on expand button
-                    if (e.target.classList.contains('task-expand-btn') || e.target.closest('.task-expand-btn')) {
-                        toggleExpand(this);
-                        return;
-                    }
-
-                    // Don't collapse if clicking on buttons, textareas, inputs, or checkboxes
-                    if (e.target.closest('.task-buttons') ||
-                        e.target.closest('.task-comment-input') ||
-                        e.target.closest('.checkbox-label') ||
-                        e.target.closest('.comment-save-btn') ||
-                        e.target.tagName === 'TEXTAREA' ||
-                        e.target.tagName === 'INPUT') {
-                        return;
-                    }
-
-                    // Collapse/expand on other clicks
-                    toggleExpand(this);
-                });
-            });
-
-            // Prevent event bubbling from textareas
-            document.querySelectorAll('.task-comment-input').forEach(textarea => {
-                textarea.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-                textarea.addEventListener('keydown', function(e) {
-                    e.stopPropagation();
-                });
-            });
-        });
-    </script>
-</body>
-</html>
+if __name__ == "__main__":
+    main()
