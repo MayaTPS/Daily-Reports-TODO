@@ -346,11 +346,12 @@ def build_quick_wins(archive_items):
     out = []
     for it in archive_items:
         task_text = (it.get("task", "") or "").strip()
+        property_text = (it.get("property", "") or "").strip()
         notes_text = (it.get("notes", "") or "").strip()
         if notes_text and notes_text.lower() not in ("done", "completed", "paid", "sent"):
-            text = html_escape(task_text + " — " + notes_text)
+            text = html_escape((property_text + ": " if property_text and property_text.upper() != "GENERAL" else "") + task_text + " — " + notes_text)
         else:
-            text = html_escape(task_text)
+            text = html_escape((property_text + ": " if property_text and property_text.upper() != "GENERAL" else "") + task_text)
         if len(text) > 110:
             text = text[:107] + "..."
         out.append(
