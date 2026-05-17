@@ -126,6 +126,10 @@
     const property = (taskItem.querySelector(".task-property")?.textContent || "").trim();
     const taskTitle = (taskItem.querySelector(".task-title")?.textContent || "").trim();
     const actor = getActor();
+    // Optimistic UI: show feedback immediately (Apps Script response sometimes hangs due to CORS-on-redirect)
+    toast("✓ Logged: " + status, true);
+    reflectStatus(taskItem, status);
+    cacheStatus(id, status, note);
     toast("✓ Logged: " + status, true);
     reflectStatus(taskItem, status);
     cacheStatus(id, status, note);
