@@ -145,6 +145,39 @@
       .tps-typeahead-item { padding: 10px 12px; font-size: 14px; cursor: pointer; }
       .tps-typeahead-item:hover, .tps-typeahead-item.active { background: #EAF3DE; }
       body.dark-mode .tps-typeahead-item:hover, body.dark-mode .tps-typeahead-item.active { background: #1f2a23; }
+
+      .tps-history-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; margin-top: 8px;
+        background: transparent; border: 1px solid #e5e5e0; border-radius: 6px;
+        font: 500 12px/1.2 inherit; color: #6b7280; cursor: pointer; transition: all 0.15s ease; }
+      .tps-history-toggle:hover { background: #f7f7f5; color: #1f2937; }
+      body.dark-mode .tps-history-toggle { border-color: #383e4b; color: #9ca3af; }
+      body.dark-mode .tps-history-toggle:hover { background: #23272f; color: #f1f1f1; }
+      .tps-history-list { margin-top: 10px; padding: 12px; background: #f7f7f5; border-radius: 10px; display: none; }
+      .tps-history-list.open { display: block; animation: tps-fade-in 0.2s ease; }
+      body.dark-mode .tps-history-list { background: #1a1d23; }
+      .tps-history-empty { font-size: 13px; color: #9ca3af; text-align: center; padding: 8px; }
+      .tps-bubble { background: #fff; border: 1px solid #e5e5e0; border-radius: 12px 12px 12px 4px;
+        padding: 10px 12px; margin-bottom: 8px; max-width: 92%; }
+      .tps-bubble:last-child { margin-bottom: 0; }
+      .tps-bubble.by-maya { background: #EAF3DE; border-color: #c4d9ad; margin-left: auto; border-radius: 12px 12px 4px 12px; }
+      .tps-bubble.by-tricia { background: #ffe9d4; border-color: #f5c895; }
+      .tps-bubble.by-craig { background: #d4e5ff; border-color: #a8c4ec; }
+      body.dark-mode .tps-bubble { background: #23272f; border-color: #383e4b; color: #f1f1f1; }
+      body.dark-mode .tps-bubble.by-maya { background: #1f2a23; border-color: #2d4031; }
+      body.dark-mode .tps-bubble.by-tricia { background: #2a221a; border-color: #4a3a25; }
+      body.dark-mode .tps-bubble.by-craig { background: #1a232f; border-color: #2d3d52; }
+      .tps-bubble-meta { font-size: 11px; color: #6b7280; margin-bottom: 4px;
+        display: flex; justify-content: space-between; gap: 8px; }
+      body.dark-mode .tps-bubble-meta { color: #9ca3af; }
+      .tps-bubble-status { font-weight: 600; }
+      .tps-bubble-text { font-size: 14px; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; }
+
+      .tps-note-modal-textarea { width: 100%; min-height: 110px; padding: 12px 14px;
+        border: 1.5px solid #e5e5e0; border-radius: 10px;
+        font: 400 15px/1.4 inherit; color: inherit; background: #fff;
+        box-sizing: border-box; resize: vertical; margin-bottom: 14px; }
+      .tps-note-modal-textarea:focus { outline: none; border-color: #1D9E75; }
+      body.dark-mode .tps-note-modal-textarea { background: #23272f; color: #f1f1f1; border-color: #383e4b; }
     `;
     const style = document.createElement("style");
     style.id = "tps-widget-styles";
@@ -472,6 +505,126 @@
   function loadCached(id) {
     try { const raw = localStorage.getItem(STORAGE_PREFIX + ":task:" + id); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
   }
+  // ============================== NOTE PROMPT ==============================
+  function promptForNote(opts) {
+    opts = opts || {};
+    return new Promise(function (resolve) {
+      const wrap = document.createElement("div");
+      wrap.innerHTML =
+        '<h2>' + escapeHtml(opts.title || "Leave a note for Maya") + '</h2>' +
+        '<p class="tps-modal-sub">' + escapeHtml(opts.sub || "A quick note so Maya knows what's happening.") + '</p>' +
+        '<textarea class="tps-note-modal-textarea" id="tps-note-text" placeholder="' + escapeHtml(opts.placeholder || "What\'s the update?") + '"></textarea>' +
+        '<div class="tps-wiz-actions">' +
+          '<button class="tps-wiz-btn secondary" id="tps-note-cancel">Cancel</button>' +
+          '<button class="tps-wiz-btn primary" id="tps-note-save" disabled>Save note</button>' +
+        '</div>';
+      const modal = openModal(wrap);
+      const ta = modal.querySelector("#tps-note-text");
+      const saveBtn = modal.querySelector("#tps-note-save");
+      const cancelBtn = modal.querySelector("#tps-note-cancel");
+      ta.addEventListener("input", function () { saveBtn.disabled = !ta.value.trim(); });
+      ta.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && ta.value.trim()) { saveBtn.click(); }
+      });
+      cancelBtn.addEventListener("click", function () { closeModal(); resolve(null); });
+      saveBtn.addEventListener("click", function () { const v = ta.value.trim(); if (!v) return; closeModal(); resolve(v); });
+      setTimeout(function () { ta.focus(); }, 50);
+    });
+  }
+
+  // ============================== HISTORY (bubbles) ==============================
+  function fetchHistory(id) {
+    return fetch(WEB_APP_URL + "?action=history&id=" + encodeURIComponent(id) + "&token=" + encodeURIComponent(SECRET_TOKEN),
+        { method: "GET", redirect: "follow" })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (data) { return (data && data.items) || []; })
+      .catch(function () { return []; });
+  }
+  function actorClass(by) {
+    const b = String(by || "").toLowerCase();
+    if (b === "maya") return "by-maya";
+    if (b === "tricia") return "by-tricia";
+    if (b === "craig") return "by-craig";
+    return "";
+  }
+  function formatBubbleTime(iso) {
+    try {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return "";
+      const now = new Date();
+      const sameDay = d.toDateString() === now.toDateString();
+      const opts = sameDay ? { hour: "numeric", minute: "2-digit" } : { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" };
+      return d.toLocaleString(undefined, opts);
+    } catch (e) { return ""; }
+  }
+  function renderBubbles(container, items) {
+    container.innerHTML = "";
+    if (!items.length) {
+      container.innerHTML = '<div class="tps-history-empty">No notes yet — be the first to add one.</div>';
+      return;
+    }
+    items.forEach(function (it) {
+      const b = document.createElement("div");
+      b.className = "tps-bubble " + actorClass(it.by);
+      const status = it.status || "";
+      const by = it.by || "Unknown";
+      const time = formatBubbleTime(it.at || it.timestamp || it.date);
+      b.innerHTML =
+        '<div class="tps-bubble-meta"><span class="tps-bubble-status">' + escapeHtml(by) +
+        (status ? ' · ' + escapeHtml(status) : '') + '</span><span>' + escapeHtml(time) + '</span></div>' +
+        '<div class="tps-bubble-text">' + escapeHtml(it.note || "—") + '</div>';
+      container.appendChild(b);
+    });
+  }
+  function addHistoryToggle(task) {
+    if (task.querySelector(".tps-history-toggle")) return;
+    const id = task.getAttribute("data-id");
+    if (!id) return;
+    const toggleBtn = document.createElement("button");
+    toggleBtn.type = "button";
+    toggleBtn.className = "tps-history-toggle";
+    toggleBtn.innerHTML = '<span>💬</span><span>View notes</span>';
+    const list = document.createElement("div");
+    list.className = "tps-history-list";
+    list.id = "tps-history-" + id;
+    list.innerHTML = '<div class="tps-history-empty">Loading…</div>';
+    task.appendChild(toggleBtn);
+    task.appendChild(list);
+    let loaded = false;
+    toggleBtn.addEventListener("click", function () {
+      const isOpen = list.classList.contains("open");
+      if (isOpen) {
+        list.classList.remove("open");
+        const count = list.querySelectorAll(".tps-bubble").length;
+        toggleBtn.innerHTML = '<span>💬</span><span>View notes' + (count ? ' (' + count + ')' : '') + '</span>';
+      } else {
+        list.classList.add("open");
+        toggleBtn.innerHTML = '<span>💬</span><span>Hide notes</span>';
+        if (!loaded) {
+          fetchHistory(id).then(function (items) {
+            loaded = true;
+            renderBubbles(list, items);
+            toggleBtn.innerHTML = '<span>💬</span><span>Hide notes (' + items.length + ')</span>';
+          });
+        }
+      }
+    });
+  }
+  function refreshHistory(taskItem) {
+    const id = taskItem.getAttribute("data-id");
+    if (!id) return;
+    const list = taskItem.querySelector(".tps-history-list");
+    if (!list) return;
+    fetchHistory(id).then(function (items) {
+      renderBubbles(list, items);
+      const toggle = taskItem.querySelector(".tps-history-toggle");
+      if (toggle) {
+        const isOpen = list.classList.contains("open");
+        toggle.innerHTML = '<span>💬</span><span>' + (isOpen ? 'Hide' : 'View') + ' notes (' + items.length + ')</span>';
+      }
+    });
+  }
+
   function send(taskItem, status, note) {
     const id = taskItem.getAttribute("data-id");
     if (!id) { toast("Couldn't log — missing task ID", false); return Promise.reject(); }
@@ -480,7 +633,7 @@
     return ensureActor().then(function (actor) {
       return postUpdate({ id: id, property: property, task: taskTitle, status: status, note: note || "", by: actor })
         .then(function (res) {
-          if (res && res.ok) { toast("✓ Logged: " + status, true); reflectStatus(taskItem, status); cacheStatus(id, status, note); }
+          if (res && res.ok) { toast("✓ Logged: " + status, true); reflectStatus(taskItem, status); cacheStatus(id, status, note); refreshHistory(taskItem); }
           else { toast("Saved locally — sheet rejected", false); reflectStatus(taskItem, status); cacheStatus(id, status, note); }
           return res;
         }).catch(function () { reflectStatus(taskItem, status); cacheStatus(id, status, note); toast("Saved locally — sheet sync failed", false); });
@@ -494,27 +647,63 @@
       const id = task.getAttribute("data-id");
       const cached = loadCached(id);
       if (cached && cached.status) reflectStatus(task, cached.status);
-      if (cached && cached.note) { const n = task.querySelector(".task-comment-input"); if (n && !n.value) n.value = cached.note; }
-      const readNote = function () { const ta = task.querySelector(".task-comment-input"); return ta ? ta.value.trim() : ""; };
-      const bind = function (sel, status) {
+
+      addHistoryToggle(task);
+
+      const triggerAction = function (status, sub, placeholder) {
+        ensureActor().then(function () {
+          promptForNote({
+            title: "Leave a note for Maya",
+            sub: sub || "Quick note so Maya knows what's happening.",
+            placeholder: placeholder || "What's the update?"
+          }).then(function (note) {
+            if (note === null) return; // cancelled — no status change, no save
+            send(task, status, note);
+          });
+        });
+      };
+      const bind = function (sel, status, sub, placeholder) {
         const btn = task.querySelector(sel);
         if (!btn) return;
-        btn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); send(task, status, readNote()); });
+        btn.addEventListener("click", function (e) {
+          e.preventDefault(); e.stopPropagation();
+          triggerAction(status, sub, placeholder);
+        });
       };
-      bind(".btn-tricia", "Tricia on it");
-      bind(".btn-maya", "Maya on it");
-      bind(".btn-craig", "Craig on it");
-      bind(".btn-approve", "Approved");
-      bind(".btn-hold", "On Hold");
-      bind(".btn-reject", "Rejected");
+      bind(".btn-tricia",  "Tricia on it", "What are you working on for this task?",       "e.g. Calling the vendor today, will update by Friday");
+      bind(".btn-maya",    "Maya on it",   "What are you working on for this task?",       "e.g. Reached out to tenant, waiting on photo");
+      bind(".btn-craig",   "Craig on it",  "What are you working on for this task?",       "e.g. Checking the site tomorrow morning");
+      bind(".btn-approve", "Approved",     "What are you approving? (vendor, cost, plan…)", "e.g. Approved Mike's quote of $480 for the faucet");
+      bind(".btn-hold",    "On Hold",      "Why on hold? Anything blocking it?",            "e.g. Waiting on tenant to confirm availability");
+      bind(".btn-reject",  "Rejected",     "Why rejected?",                                  "e.g. Quote too high — need 2 more bids");
+
       const doneCb = task.querySelector(".task-checkbox");
-      if (doneCb) doneCb.addEventListener("change", function (e) { if (doneCb.checked) { e.stopPropagation(); send(task, "Done", readNote()); } });
+      if (doneCb) doneCb.addEventListener("change", function (e) {
+        if (!doneCb.checked) return;
+        e.stopPropagation();
+        // Roll back the checkbox until the note is confirmed; we'll re-check on save
+        doneCb.checked = false;
+        ensureActor().then(function () {
+          promptForNote({
+            title: "Leave a note for Maya",
+            sub: "Why is this done? What got resolved?",
+            placeholder: "e.g. Tenant confirmed leak fixed, photo received"
+          }).then(function (note) {
+            if (note === null) return;
+            doneCb.checked = true;
+            send(task, "Done", note);
+          });
+        });
+      });
+
+      // Free-form save button — still works for adding a note without a status change
       const saveBtn = task.querySelector(".comment-save-btn");
       if (saveBtn) saveBtn.addEventListener("click", function (e) {
         e.preventDefault(); e.stopPropagation();
-        const n = readNote();
+        const ta = task.querySelector(".task-comment-input");
+        const n = ta ? ta.value.trim() : "";
         if (!n) { toast("Note is empty", false); return; }
-        send(task, "Note added", n);
+        send(task, "Note added", n).then(function () { if (ta) ta.value = ""; });
       });
     });
     console.log("[TPS Widget] Wired " + tasks.length + " task items.");
