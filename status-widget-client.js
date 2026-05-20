@@ -178,6 +178,19 @@
         box-sizing: border-box; resize: vertical; margin-bottom: 14px; }
       .tps-note-modal-textarea:focus { outline: none; border-color: #1D9E75; }
       body.dark-mode .tps-note-modal-textarea { background: #23272f; color: #f1f1f1; border-color: #383e4b; }
+
+      .tps-remind-btn {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 4px 8px; margin-top: 6px; margin-left: 6px;
+        background: transparent; border: 1px solid #e5e5e0;
+        border-radius: 6px; font: 500 11px/1.2 inherit;
+        color: #6b7280; cursor: pointer; transition: all 0.15s ease;
+      }
+      .tps-remind-btn:hover { background: #fef9c3; border-color: #fcd34d; color: #92400e; }
+      body.dark-mode .tps-remind-btn { border-color: #383e4b; color: #9ca3af; }
+      body.dark-mode .tps-remind-btn:hover { background: #2a221a; border-color: #d97706; color: #fbbf24; }
+      .tps-remind-label { display: block; font: 600 12px/1.2 inherit; color: #6b7280; margin-bottom: 4px; margin-top: 8px; }
+      body.dark-mode .tps-remind-label { color: #9ca3af; }
     `;
     const style = document.createElement("style");
     style.id = "tps-widget-styles";
@@ -477,6 +490,11 @@
   }
   function postAddTask(payload) {
     const body = Object.assign({ token: SECRET_TOKEN, source: "Dashboard" }, payload);
+  function postRemindMe(payload) {
+    const body = Object.assign({ token: SECRET_TOKEN, source: "Dashboard" }, payload);
+    return fetch(WEB_APP_URL + "?action=remindMe", { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body), redirect: "follow" })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+  }
     return fetch(WEB_APP_URL + "?action=addTask", { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body), redirect: "follow" })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
   }
@@ -625,6 +643,91 @@
     });
   }
 
+  // ============================== REMIND ME ==============================
+  function addRemindMeButton(task) {
+    if (task.querySelector(".tps-remind-btn")) return;
+    const id = task.getAttribute("data-id");
+    if (!id) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tps-remind-btn";
+    btn.innerHTML = '<span>🔔</span><span>Remind me</span>';
+    btn.addEventListener("click", function () { openRemindMeModal(task); });
+    task.appendChild(btn);
+  }
+
+  function openRemindMeModal(task) {
+    ensureActor().then(function (actor) {
+      const id = task.getAttribute("data-id") || "";
+      const property = (task.querySelector(".task-property")?.textContent || "").trim();
+      const taskTitle = (task.querySelector(".task-title")?.textContent || "").trim();
+      const defaultTitle = "🔔 " + (property || "Task") + (taskTitle ? " — " + taskTitle : "");
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const yyyy = tomorrow.getFullYear();
+      const mm = String(tomorrow.getMonth() + 1).padStart(2, "0");
+      const dd = String(tomorrow.getDate()).padStart(2, "0");
+      const defaultDate = yyyy + "-" + mm + "-" + dd;
+      const defaultTime = "09:00";
+
+      const wrap = document.createElement("div");
+      wrap.innerHTML =
+        '<h2>Set a reminder</h2>' +
+        '<p class="tps-modal-sub">Creates a Google Calendar event and invites Tricia. Everyone gets a popup 10 min before + email 1 hour before.</p>' +
+        '<label class="tps-remind-label">Title</label>' +
+        '<input type="text" class="tps-wiz-field" id="tps-rem-title" />' +
+        '<div style="display:flex; gap:8px; margin-top:10px;">' +
+          '<div style="flex:1;"><label class="tps-remind-label">Date</label><input type="date" class="tps-wiz-field" id="tps-rem-date" /></div>' +
+          '<div style="flex:1;"><label class="tps-remind-label">Time</label><input type="time" class="tps-wiz-field" id="tps-rem-time" /></div>' +
+        '</div>' +
+        '<label class="tps-remind-label" style="margin-top:10px;">Quick note <span style="font-weight:400;color:#9ca3af;font-size:13px;">(optional)</span></label>' +
+        '<textarea class="tps-note-modal-textarea" id="tps-rem-desc" placeholder="Any context, link, or detail you want to remember…"></textarea>' +
+        '<div class="tps-wiz-actions">' +
+          '<button class="tps-wiz-btn secondary" id="tps-rem-cancel">Cancel</button>' +
+          '<button class="tps-wiz-btn primary" id="tps-rem-save">Set reminder</button>' +
+        '</div>';
+
+      const modal = openModal(wrap);
+      modal.querySelector("#tps-rem-title").value = defaultTitle;
+      modal.querySelector("#tps-rem-date").value = defaultDate;
+      modal.querySelector("#tps-rem-time").value = defaultTime;
+      const descTa = modal.querySelector("#tps-rem-desc");
+
+      fetchHistory(id).then(function (items) {
+        if (items && items[0] && items[0].note && !descTa.value) {
+          descTa.value = items[0].note;
+        }
+      }).catch(function () {});
+
+      modal.querySelector("#tps-rem-cancel").addEventListener("click", closeModal);
+      modal.querySelector("#tps-rem-save").addEventListener("click", function () {
+        const title = modal.querySelector("#tps-rem-title").value.trim();
+        const date = modal.querySelector("#tps-rem-date").value;
+        const time = modal.querySelector("#tps-rem-time").value;
+        const desc = descTa.value.trim();
+        if (!title) { toast("Title is empty", false); return; }
+        if (!date || !time) { toast("Date and time required", false); return; }
+        const whenIso = date + "T" + time + ":00";
+        wrap.innerHTML = '<h2>Setting reminder…</h2><p class="tps-modal-sub">Creating the calendar event.</p>';
+        postRemindMe({ id: id, title: title, property: property, task: taskTitle, when: whenIso, description: desc, by: actor })
+          .then(function (res) {
+            if (res && res.ok) {
+              wrap.innerHTML = '<h2>✓ Reminder set</h2><p class="tps-modal-sub">Check your calendar — Tricia is invited too. Popup 10 min before, email 1 hour before.</p><div class="tps-wiz-actions"><span></span><button class="tps-wiz-btn primary" id="tps-rem-done">Done</button></div>';
+              wrap.querySelector("#tps-rem-done").addEventListener("click", closeModal);
+              try { refreshHistory(task); } catch (e) {}
+            } else {
+              wrap.innerHTML = '<h2>Couldn\'t set reminder</h2><p class="tps-modal-sub">' + ((res && res.error) || 'Network issue') + '</p><div class="tps-wiz-actions"><span></span><button class="tps-wiz-btn primary" id="tps-rem-close">Close</button></div>';
+              wrap.querySelector("#tps-rem-close").addEventListener("click", closeModal);
+            }
+          }).catch(function () {
+            wrap.innerHTML = '<h2>Network problem</h2><p class="tps-modal-sub">Couldn\'t reach the calendar. Try again in a moment.</p><div class="tps-wiz-actions"><span></span><button class="tps-wiz-btn primary" id="tps-rem-close">Close</button></div>';
+            wrap.querySelector("#tps-rem-close").addEventListener("click", closeModal);
+          });
+      });
+    });
+  }
+
   function send(taskItem, status, note) {
     const id = taskItem.getAttribute("data-id");
     if (!id) { toast("Couldn't log — missing task ID", false); return Promise.reject(); }
@@ -649,6 +752,7 @@
       if (cached && cached.status) reflectStatus(task, cached.status);
 
       addHistoryToggle(task);
+      addRemindMeButton(task);
 
       const triggerAction = function (status, sub, placeholder) {
         ensureActor().then(function () {
