@@ -490,12 +490,12 @@
   }
   function postAddTask(payload) {
     const body = Object.assign({ token: SECRET_TOKEN, source: "Dashboard" }, payload);
+    return fetch(WEB_APP_URL + "?action=addTask", { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body), redirect: "follow" })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+  }
   function postRemindMe(payload) {
     const body = Object.assign({ token: SECRET_TOKEN, source: "Dashboard" }, payload);
     return fetch(WEB_APP_URL + "?action=remindMe", { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body), redirect: "follow" })
-      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
-  }
-    return fetch(WEB_APP_URL + "?action=addTask", { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body), redirect: "follow" })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
   }
   function cacheNewTask(state) {
