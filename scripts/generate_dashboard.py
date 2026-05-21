@@ -131,13 +131,15 @@ def row_to_dict(headers, row):
 
 def get_task_id(row_dict, header_row_idx, row_idx, prefix=""):
     """
-    Produce a stable task ID using the spreadsheet's '#' or 'ID' column when
-    available, else a deterministic fallback derived from the row position.
+    Produce a stable task ID using the spreadsheet's '#' or 'ID' column so it
+    matches Apps Script's getMergedItems() output exactly. Falls back to a
+    row-position-based ID if the column is missing.
     """
     for key in ("#", "ID", "Id", "id"):
         if key in row_dict and str(row_dict[key]).strip():
-            return str(row_dict[key]).strip()
-    # Fallback: sheet row number (1-indexed in spreadsheet; +1 for header row)
+            raw = str(row_dict[key]).strip()
+            return f"{prefix}-{raw}" if prefix else raw
+    # Fallback: deterministic row marker (only used when sheet has no ID column)
     return f"row-{header_row_idx + row_idx + 2}"
 
 
@@ -169,7 +171,7 @@ def fetch_operations_log(client):
         category = rd.get("Category", "").strip() or "General"
 
         grouped[category][status].append({
-            "id":       get_task_id(rd, header_idx, offset, prefix=""),
+            "id":       get_task_id(rd, header_idx, offset, prefix="ops"),
             "property": rd.get("Property", "").strip(),
             "task":     task,
             "notes":    rd.get("Notes", "").strip(),
@@ -208,6 +210,7 @@ def fetch_archive(client, limit=9):
             "property": rd.get("Property", "").strip(),
             "task":     task,
             "notes":    rd.get("Notes", "").strip(),
+            "status":   rd.get("Status", "").strip() or "Done",
         })
         if len(items) >= limit:
             break
@@ -347,11 +350,9 @@ def build_quick_wins(archive_items):
     for it in archive_items:
         task_text = (it.get("task", "") or "").strip()
         property_text = (it.get("property", "") or "").strip()
-        notes_text = (it.get("notes", "") or "").strip()
-        if notes_text and notes_text.lower() not in ("done", "completed", "paid", "sent"):
-            text = html_escape((property_text + ": " if property_text and property_text.upper() != "GENERAL" else "") + task_text + " — " + notes_text)
-        else:
-            text = html_escape((property_text + ": " if property_text and property_text.upper() != "GENERAL" else "") + task_text)
+        status_text = (it.get("status", "") or "").strip() or "Done"
+        prefix = (property_text + ": ") if property_text and property_text.upper() != "GENERAL" else ""
+        text = html_escape(prefix + task_text + " — " + status_text)
         if len(text) > 110:
             text = text[:107] + "..."
         out.append(
